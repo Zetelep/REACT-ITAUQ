@@ -12,10 +12,25 @@ export default function Home() {
   const { session, signOut } = useAuth()
   const [activePage, setActivePage] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const jwtToken = session?.access_token || ''
 
   const handleNav = (key) => {
     setActivePage(key)
     setSidebarOpen(false)
+  }
+
+  const handleCopyJwt = async () => {
+    if (!jwtToken) return
+
+    try {
+      await navigator.clipboard.writeText(jwtToken)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (error) {
+      console.error('Failed to copy JWT:', error)
+    }
   }
 
   return (
@@ -124,6 +139,31 @@ export default function Home() {
                 </div>
               </div>
             </section>
+          </div>
+        ) : activePage === 'setting' ? (
+          <div className="settings-content">
+            <div className="settings-card">
+              <div className="settings-header">
+                <div>
+                  <p className="settings-label">Account</p>
+                  <h1 className="settings-title">JWT Key</h1>
+                </div>
+                <button className="copy-btn" onClick={handleCopyJwt} disabled={!jwtToken}>
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+
+              <div className="settings-meta">
+                <span className="meta-label">Signed in as</span>
+                <strong>{session?.user?.email || 'No active user'}</strong>
+              </div>
+
+              <div className="jwt-box">
+                <code className="jwt-value">
+                  {jwtToken || 'No JWT available. Please log in again.'}
+                </code>
+              </div>
+            </div>
           </div>
         ) : (
           <h1>This is {pages.find((p) => p.key === activePage)?.label}</h1>

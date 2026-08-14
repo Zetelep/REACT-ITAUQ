@@ -328,6 +328,96 @@
   cursor: pointer;
 }
 
+/* ─── Settings Page ─── */
+.settings-content {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.settings-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dfe7e5;
+  border-radius: 16px;
+  box-shadow: 0 18px 45px rgba(15, 118, 110, 0.08);
+  padding: 28px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.settings-label {
+  margin: 0 0 8px;
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.2vw, 2.4rem);
+  color: #0f172a;
+}
+
+.copy-btn {
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.copy-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.copy-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  color: #334155;
+}
+
+.meta-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.jwt-box {
+  background: #f8fafc;
+  border: 1px solid #dfe7e5;
+  border-radius: 12px;
+  padding: 18px;
+  overflow: auto;
+}
+
+.jwt-value {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #0f172a;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
 /* ─── Responsive: Mobile ─── */
 @media (max-width: 768px) {
   .mobile-topbar {
@@ -391,5 +481,18 @@
 
   .dashboard-main h1 {
     font-size: 1.5rem;
+  }
+
+  .settings-card {
+    padding: 20px 16px;
+  }
+
+  .settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .copy-btn {
+    width: 100%;
   }
 }
