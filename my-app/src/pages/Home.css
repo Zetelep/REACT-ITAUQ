@@ -54,6 +54,20 @@
   justify-content: space-between;
 }
 
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sidebar-brand-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex: 0 0 30px;
+}
+
 .sidebar-header h2 {
   margin: 0;
   font-size: 1.5rem;
@@ -190,7 +204,7 @@
   justify-content: center;
 }
 
-.sidebar.collapsed .sidebar-header h2,
+.sidebar.collapsed .sidebar-brand,
 .sidebar.collapsed .sidebar-label,
 .sidebar.collapsed .sidebar-user {
   display: none;

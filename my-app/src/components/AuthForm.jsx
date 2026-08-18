@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthProvider'
 import SignUpForm from './SignUpForm'
 import './AuthForm.css'
 import authImage from '../assets/authpageimg.jpg'
+import logoItauq from '../assets/icon.png'
 
 export default function AuthForm() {
   const [email, setEmail] = useState('')
@@ -52,23 +53,24 @@ export default function AuthForm() {
       {/* Left Brand Panel */}
       <div className="auth-brand" style={{ '--auth-bg': `url(${authImage})` }}>
         <div className="auth-brand-logo">
-          <span>✦ ITAUQ</span>
+          <img src={logoItauq} alt="ITAUQ logo" />
+          <span>Evaluasi usability dengan mudah</span>
         </div>
         <div className="auth-brand-card">
-          <h2>Platform Pembelajaran Al-Qur'an Interaktif</h2>
-          <p>Belajar membaca dan memahami Al-Qur'an dengan metode modern yang interaktif dan mudah diikuti. Bergabunglah dengan ribuan siswa lainnya.</p>
+          <h2>Dashboard Indonesian Tourism Application Usability Questionnaire</h2>
+          <p>Evaluasi pengalaman dan usability aplikasi pariwisata Indonesia melalui instrumen yang dirancang sesuai dengan konteks pengguna Indonesia.</p>
           <div className="auth-brand-features">
             <div className="auth-brand-feature">
-              <div className="auth-brand-feature-icon">📖</div>
-              <span>Belajar Tajwid dengan mudah</span>
+              <div className="auth-brand-feature-icon">📋</div>
+              <span>Evaluasi usability dengan mudah</span>
             </div>
             <div className="auth-brand-feature">
               <div className="auth-brand-feature-icon">🎯</div>
-              <span>Latihan interaktif & kuis</span>
+              <span>Kuesioner I-TAUQ yang kontekstual</span>
             </div>
             <div className="auth-brand-feature">
               <div className="auth-brand-feature-icon">📊</div>
-              <span>Pantau progress belajar Anda</span>
+              <span>Pantau hasil dan progress evaluasi Anda</span>
             </div>
           </div>
         </div>
