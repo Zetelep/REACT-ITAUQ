@@ -62,6 +62,27 @@
   letter-spacing: -0.5px;
 }
 
+.sidebar-toggle {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 .sidebar-close {
   display: none;
   background: none;
@@ -82,6 +103,10 @@
 }
 
 .sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid transparent;
   color: rgba(240, 253, 244, 0.8);
@@ -139,6 +164,66 @@
 
 .sidebar-signout:hover {
   background: rgba(255, 255, 255, 0.18);
+}
+
+.sidebar-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex: 0 0 24px;
+}
+
+.sidebar-signout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.sidebar.collapsed {
+  width: 76px;
+  min-width: 76px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 28px 12px 20px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-header h2,
+.sidebar.collapsed .sidebar-label,
+.sidebar.collapsed .sidebar-user {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+  margin: 0;
+  width: 52px;
+  height: 46px;
+}
+
+.sidebar.collapsed .sidebar-link,
+.sidebar.collapsed .sidebar-signout {
+  justify-content: center;
+  width: 52px;
+  min-height: 46px;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar.collapsed .sidebar-link:hover {
+  transform: none;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  align-items: center;
+}
+
+.sidebar.collapsed .sidebar-signout {
+  width: 52px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ─── Main Content ─── */
@@ -465,6 +550,29 @@
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .sidebar.collapsed {
+    width: 260px;
+    min-width: 260px;
+  }
+
+  .sidebar.collapsed .sidebar-header h2,
+  .sidebar.collapsed .sidebar-label,
+  .sidebar.collapsed .sidebar-user {
+    display: block;
+  }
+
+  .sidebar.collapsed .sidebar-link,
+  .sidebar.collapsed .sidebar-signout {
+    justify-content: flex-start;
+    padding-left: 16px;
+    padding-right: 16px;
+    width: 100%;
+  }
+
+  .sidebar-toggle {
+    display: none;
   }
 
   .sidebar-close {

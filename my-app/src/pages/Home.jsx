@@ -1,24 +1,49 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthProvider'
+import dashboardIcon from '../assets/dashboard_30.png'
+import settingsIcon from '../assets/settings_30.png'
+import taskIcon from '../assets/task_30.png'
+import logoutIcon from '../assets/logout_30.png'
+import arrowBackIcon from '../assets/arrow_back_30.png'
+import arrowForwardIcon from '../assets/arrow_forward_30.png'
 import './Home.css'
 
 const pages = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'evaluasi', label: 'Evaluasi' },
-  { key: 'setting', label: 'Setting' },
+  { key: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: dashboardIcon },
+  { key: 'evaluasi', label: 'Evaluasi', path: '/evaluasi', icon: taskIcon },
+  { key: 'setting', label: 'Setting', path: '/setting', icon: settingsIcon },
 ]
 
 export default function Home() {
   const { session, signOut } = useAuth()
-  const [activePage, setActivePage] = useState('dashboard')
+  const location = useLocation()
+  const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const activePage = useMemo(() => {
+    if (location.pathname.startsWith('/evaluasi')) return 'evaluasi'
+    if (location.pathname.startsWith('/setting')) return 'setting'
+    return 'dashboard'
+  }, [location.pathname])
 
   const jwtToken = session?.access_token || ''
 
   const handleNav = (key) => {
-    setActivePage(key)
+    const targetPage = pages.find((page) => page.key === key)
+    if (targetPage) {
+      navigate(targetPage.path)
+    }
     setSidebarOpen(false)
+  }
+
+  const handleSignOut = async () => {
+    const confirmed = window.confirm('Are you sure you want to sign out?')
+    if (confirmed) {
+      await signOut()
+    }
   }
 
   const handleCopyJwt = async () => {
@@ -49,9 +74,16 @@ export default function Home() {
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
 
       {/* ─── Sidebar ─── */}
-      <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+      <aside className={`sidebar${sidebarOpen ? ' open' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
         <div className="sidebar-header">
           <h2>ITAUQ</h2>
+          <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            <img
+              src={sidebarCollapsed ? arrowForwardIcon : arrowBackIcon}
+              alt=""
+              className="sidebar-toggle-icon"
+            />
+          </button>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
             &times;
           </button>
@@ -62,15 +94,19 @@ export default function Home() {
               key={p.key}
               className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
               onClick={() => handleNav(p.key)}
+            title={sidebarCollapsed ? p.label : undefined}
+            aria-label={p.label}
             >
-              {p.label}
+              <img src={p.icon} alt="" className="sidebar-icon" />
+              <span className="sidebar-label">{p.label}</span>
             </button>
           ))}
         </nav>
         <div className="sidebar-footer">
           <p className="sidebar-user">{session?.user?.email}</p>
-          <button className="sidebar-signout" onClick={() => signOut()}>
-            Sign Out
+          <button className="sidebar-signout" onClick={handleSignOut} title={sidebarCollapsed ? 'Sign Out' : undefined} aria-label="Sign Out">
+            <img src={logoutIcon} alt="" className="sidebar-icon" />
+            <span className="sidebar-label">Sign Out</span>
           </button>
         </div>
       </aside>
