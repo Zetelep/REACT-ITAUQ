@@ -7,6 +7,8 @@ import taskIcon from '../assets/task_30.png'
 import logoutIcon from '../assets/logout_30.png'
 import arrowBackIcon from '../assets/arrow_back_30.png'
 import arrowForwardIcon from '../assets/arrow_forward_30.png'
+import logoItauq from '../assets/icon.png'
+
 import './Home.css'
 
 const pages = [
@@ -76,7 +78,10 @@ export default function Home() {
       {/* ─── Sidebar ─── */}
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
         <div className="sidebar-header">
-          <h2>ITAUQ</h2>
+          <div className="sidebar-brand">
+            <img src={logoItauq} alt="ITAUQ logo" className="sidebar-brand-logo" />
+            <h2>ITAUQ</h2>
+          </div>
           <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
             <img
               src={sidebarCollapsed ? arrowForwardIcon : arrowBackIcon}

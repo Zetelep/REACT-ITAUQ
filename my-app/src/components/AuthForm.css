@@ -45,12 +45,21 @@
 }
 
 .auth-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.5px;
   margin-bottom: 32px;
   position: relative;
   z-index: 1;
+}
+
+.auth-brand-logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .auth-brand-logo span {
