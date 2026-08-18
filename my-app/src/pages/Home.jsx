@@ -20,7 +20,7 @@ export default function Home() {
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [copied, setCopied] = useState(false)
 
   const activePage = useMemo(() => {
