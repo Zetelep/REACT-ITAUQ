@@ -12,9 +12,9 @@ import logoItauq from '../assets/icon.png'
 import './Home.css'
 
 const pages = [
-  { key: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: dashboardIcon },
-  { key: 'evaluasi', label: 'Evaluasi', path: '/evaluasi', icon: taskIcon },
-  { key: 'setting', label: 'Setting', path: '/setting', icon: settingsIcon },
+  { key: 'dashboard', label: 'Dashboard', path: '/admin/dashboard', icon: dashboardIcon },
+  { key: 'evaluasi', label: 'Evaluasi', path: '/admin/evaluasi', icon: taskIcon },
+  { key: 'setting', label: 'Setting', path: '/admin/settings', icon: settingsIcon },
 ]
 
 export default function Home() {
@@ -26,8 +26,8 @@ export default function Home() {
   const [copied, setCopied] = useState(false)
 
   const activePage = useMemo(() => {
-    if (location.pathname.startsWith('/evaluasi')) return 'evaluasi'
-    if (location.pathname.startsWith('/setting')) return 'setting'
+    if (location.pathname.startsWith('/admin/evaluasi')) return 'evaluasi'
+    if (location.pathname.startsWith('/admin/settings')) return 'setting'
     return 'dashboard'
   }, [location.pathname])
 
