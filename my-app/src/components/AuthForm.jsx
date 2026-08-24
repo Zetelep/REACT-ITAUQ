@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthProvider'
 import SignUpForm from './SignUpForm'
 import './AuthForm.css'
-import authImage from '../assets/authpageimg.jpg'
 import logoItauq from '../assets/icon.png'
 
 export default function AuthForm() {
@@ -49,103 +48,80 @@ export default function AuthForm() {
   }
 
   return (
-    <div className="auth-layout">
-      {/* Left Brand Panel */}
-      <div className="auth-brand" style={{ '--auth-bg': `url(${authImage})` }}>
-        <div className="auth-brand-logo">
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
           <img src={logoItauq} alt="ITAUQ logo" />
-          <span>Evaluasi usability dengan mudah</span>
+          <span>ITAUQ</span>
         </div>
-        <div className="auth-brand-card">
-          <h2>Dashboard Indonesian Tourism Application Usability Questionnaire</h2>
-          <p>Evaluasi pengalaman dan usability aplikasi pariwisata Indonesia melalui instrumen yang dirancang sesuai dengan konteks pengguna Indonesia.</p>
-          <div className="auth-brand-features">
-            <div className="auth-brand-feature">
-              <div className="auth-brand-feature-icon">📋</div>
-              <span>Evaluasi usability dengan mudah</span>
-            </div>
-            <div className="auth-brand-feature">
-              <div className="auth-brand-feature-icon">🎯</div>
-              <span>Kuesioner I-TAUQ yang kontekstual</span>
-            </div>
-            <div className="auth-brand-feature">
-              <div className="auth-brand-feature-icon">📊</div>
-              <span>Pantau hasil dan progress evaluasi Anda</span>
+
+        <div className="auth-header">
+          <h1>Selamat Datang</h1>
+          <p>Masuk untuk melanjutkan ke dashboard evaluasi</p>
+        </div>
+
+        {message.text && (
+          <div className={`auth-message ${message.type}`}>
+            {message.text}
+          </div>
+        )}
+
+        <div className="auth-form" onKeyDown={handleKeyDown}>
+          <div className="auth-field">
+            <label className="auth-field-label">Email</label>
+            <div className="auth-field-input-wrapper">
+              <span className="auth-field-icon">✉</span>
+              <input
+                className="auth-field-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Right Form Panel */}
-      <div className="auth-form-panel">
-        <div className="auth-form-container">
-          <div className="auth-form-header">
-            <h1>Selamat Datang</h1>
-            <p>Masuk menggunakan akun Anda untuk melanjutkan</p>
+          <div className="auth-field">
+            <div className="auth-field-row">
+              <label className="auth-field-label">Password</label>
+              <a href="#" className="auth-forgot-link">Lupa Password?</a>
+            </div>
+            <div className="auth-field-input-wrapper">
+              <span className="auth-field-icon">🔒</span>
+              <input
+                className="auth-field-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+            </div>
           </div>
 
-          {message.text && (
-            <div className={`auth-message ${message.type}`}>
-              {message.text}
-            </div>
-          )}
-
-          <div className="auth-form" onKeyDown={handleKeyDown}>
-            <div className="auth-field">
-              <label className="auth-field-label">Email</label>
-              <div className="auth-field-input-wrapper">
-                <span className="auth-field-icon">✉</span>
-                <input
-                  className="auth-field-input"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div className="auth-field">
-              <div className="auth-field-row">
-                <label className="auth-field-label">Password</label>
-                <a href="#" className="auth-forgot-link">Lupa Password?</a>
-              </div>
-              <div className="auth-field-input-wrapper">
-                <span className="auth-field-icon">🔒</span>
-                <input
-                  className="auth-field-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <button
-              className={`auth-submit-btn${loading ? ' loading' : ''}`}
-              onClick={handleSignin}
-              disabled={loading}
-            >
-              {loading && (
-                <span className="spinner">
-                  <span className="spinner-icon" />
-                </span>
-              )}
-              {loading ? 'Memproses...' : 'Login'}
-            </button>
-
-            </div>
-
-          <p className="auth-footer">
-            Butuh akun?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUpMode(true) }}>
-              Daftar untuk mendapatkan akses
-            </a>
-          </p>
+          <button
+            className={`auth-submit-btn${loading ? ' loading' : ''}`}
+            onClick={handleSignin}
+            disabled={loading}
+          >
+            {loading && (
+              <span className="spinner">
+                <span className="spinner-icon" />
+              </span>
+            )}
+            {loading ? 'Memproses...' : 'Login'}
+          </button>
         </div>
+
+        <div className="auth-divider" />
+
+        <p className="auth-footer">
+          Butuh akun?{' '}
+          <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUpMode(true) }}>
+            Daftar untuk mendapatkan akses
+          </a>
+        </p>
       </div>
     </div>
   )
