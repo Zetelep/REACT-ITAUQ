@@ -130,13 +130,14 @@
   padding: 12px 16px;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* Only animate compositor-friendly properties (opacity/transform) —
+     `transition: all` also animated layout props and caused jank */
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .sidebar-link:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  transform: translateX(2px);
 }
 
 .sidebar-link.active {
@@ -283,8 +284,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  /* Solid background instead of backdrop-filter: blur() — the blur forced
+     constant full-area recompositing on every paint and caused severe lag */
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .dashboard-main h1 {
@@ -369,7 +371,7 @@
   align-items: center;
   gap: 8px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 .primary-btn:hover {
   transform: translateY(-2px);
@@ -395,7 +397,7 @@
   flex-direction: column;
   justify-content: center;
   box-shadow: 0 4px 16px rgba(15, 118, 110, 0.06);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 .stat-card:hover {
   transform: translateY(-2px);
@@ -443,11 +445,10 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 0.88rem;
-  transition: background 0.12s ease, transform 0.12s ease;
+  transition: background-color 0.12s ease;
 }
 .archive-link:hover {
   background: rgba(15, 118, 110, 0.08);
-  transform: translateY(-1px);
 }
 .latest-cards {
   display: flex;
@@ -466,7 +467,7 @@
   padding: 14px 16px;
   background: #fff;
   box-shadow: 0 4px 16px rgba(15, 118, 110, 0.05);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 .latest-card:hover {
   transform: translateY(-2px);
@@ -659,6 +660,8 @@
     width: 280px;
     min-width: 0;
     transform: translateX(-100%);
+    /* GPU-accelerated transform animation only */
+    will-change: transform;
     transition: transform 0.25s ease;
     box-shadow: 10px 0 24px rgba(15, 118, 110, 0.22);
   }
