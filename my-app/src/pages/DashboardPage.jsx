@@ -3,8 +3,8 @@ export default function DashboardPage() {
     <div className="dashboard-content">
       <div className="dashboard-header-card large">
         <div className="header-left">
-          <h2 className="header-title">INDONESIAN TOURISM USABILITY QUESTIONNAIRE DASHBOARD</h2>
-          <p className="header-desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
+          <h2 className="header-title">Dashboard Evaluasi Usability</h2>
+          <p className="header-desc">Indonesian Tourism Application Usability Questionnaire — buat, kelola, dan pantau evaluasi usability aplikasi pariwisata Anda dalam satu tempat.</p>
           <div className="header-actions">
             <button className="primary-btn">+ Buat Evaluasi</button>
           </div>
@@ -43,12 +43,14 @@ export default function DashboardPage() {
 }
 
 function EvaluationSummary({ title, status }) {
+  const statusClass =
+    status === 'Selesai' ? 'done' : status === 'Menunggu Responden' ? 'waiting' : ''
   return (
     <div className="latest-card">
       <div className="card-icon">📄</div>
       <div className="card-body">
         <div className="card-title">{title}</div>
-        <div className="card-sub">{status}</div>
+        <span className={`status-badge ${statusClass}`}>{status}</span>
       </div>
       <button className="card-action" aria-label={`Actions for ${title}`}>⋯</button>
     </div>

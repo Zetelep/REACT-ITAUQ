@@ -7,10 +7,18 @@ import taskIcon from '../assets/task_30.png'
 import logoutIcon from '../assets/logout_30.png'
 import arrowBackIcon from '../assets/arrow_back_30.png'
 import arrowForwardIcon from '../assets/arrow_forward_30.png'
+import accountBoxIcon from '../assets/account_box_30dp.png'
+import approvalIcon from '../assets/approval_delegation_30dp_.png'
+import assignmentIcon from '../assets/assignment_30dp.png'
+import sentimentIcon from '../assets/sentiment_content_30dp.png'
 import logoItauq from '../assets/icon.png'
 import DashboardPage from './DashboardPage'
 import EvaluationPage from './EvaluationPage'
 import SettingsPage from './SettingsPage'
+import AllEvaluationsPage from './AllEvaluationsPage'
+import AccountRequestsPage from './AccountRequestsPage'
+import AccountManagementPage from './AccountManagementPage'
+import SusEvaluationPage from './SusEvaluationPage'
 
 import './Home.css'
 
@@ -19,6 +27,18 @@ const pages = [
   { key: 'evaluasi', label: 'Evaluasi', path: '/admin/evaluasi', icon: taskIcon },
   { key: 'setting', label: 'Setting', path: '/admin/settings', icon: settingsIcon },
 ]
+
+// Only visible for accounts with the Super Admin role
+const superAdminPages = [
+  { key: 'semua-evaluasi', label: 'Semua Evaluasi', path: '/admin/semua-evaluasi', icon: assignmentIcon },
+  { key: 'pengajuan-akun', label: 'Pengajuan Akun', path: '/admin/pengajuan-akun', icon: approvalIcon },
+  { key: 'manajemen-akun', label: 'Manajemen Akun', path: '/admin/manajemen-akun', icon: accountBoxIcon },
+  { key: 'evaluasi-sus', label: 'Evaluasi SUS', path: '/admin/evaluasi-sus', icon: sentimentIcon },
+
+]
+
+// Hardcoded super admin check — change this based on profiles roles table later
+const SUPER_ADMIN_EMAILS = ['noro58.12@gmail.com']
 
 export default function Home() {
   const { session, signOut } = useAuth()
@@ -29,15 +49,22 @@ export default function Home() {
   const [copied, setCopied] = useState(false)
 
   const activePage = useMemo(() => {
+    if (location.pathname.startsWith('/admin/evaluasi-sus')) return 'evaluasi-sus'
+    if (location.pathname.startsWith('/admin/semua-evaluasi')) return 'semua-evaluasi'
     if (location.pathname.startsWith('/admin/evaluasi')) return 'evaluasi'
+    if (location.pathname.startsWith('/admin/pengajuan-akun')) return 'pengajuan-akun'
+    if (location.pathname.startsWith('/admin/manajemen-akun')) return 'manajemen-akun'
     if (location.pathname.startsWith('/admin/settings')) return 'setting'
     return 'dashboard'
   }, [location.pathname])
 
   const jwtToken = session?.access_token || ''
 
+  // Hardcoded super admin check — change this based on profiles roles table later
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(session?.user?.email)
+
   const handleNav = (key) => {
-    const targetPage = pages.find((page) => page.key === key)
+    const targetPage = [...pages, ...superAdminPages].find((page) => page.key === key)
     if (targetPage) {
       navigate(targetPage.path)
     }
@@ -109,6 +136,30 @@ export default function Home() {
               <span className="sidebar-label">{p.label}</span>
             </button>
           ))}
+
+          {/* ─── Super Admin section ─── */}
+          {isSuperAdmin && (
+            <>
+              <div className="sidebar-divider">
+                <span className="sidebar-divider-line" />
+                <span className="sidebar-divider-text">Super Admin</span>
+                <span className="sidebar-divider-line" />
+              </div>
+
+              {superAdminPages.map((p) => (
+                <button
+                  key={p.key}
+                  className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
+                  onClick={() => handleNav(p.key)}
+                  title={sidebarCollapsed ? p.label : undefined}
+                  aria-label={p.label}
+                >
+                  <img src={p.icon} alt="" className="sidebar-icon" />
+                  <span className="sidebar-label">{p.label}</span>
+                </button>
+              ))}
+            </>
+          )}
         </nav>
         <div className="sidebar-footer">
           <p className="sidebar-user">{session?.user?.email}</p>
@@ -123,6 +174,10 @@ export default function Home() {
       <main className="dashboard-main">
         {activePage === 'dashboard' && <DashboardPage />}
         {activePage === 'evaluasi' && <EvaluationPage />}
+        {activePage === 'semua-evaluasi' && <AllEvaluationsPage />}
+        {activePage === 'evaluasi-sus' && <SusEvaluationPage />}
+        {activePage === 'pengajuan-akun' && <AccountRequestsPage />}
+        {activePage === 'manajemen-akun' && <AccountManagementPage />}
         {activePage === 'setting' && (
           <SettingsPage
             jwtToken={jwtToken}
