@@ -44,6 +44,10 @@
   flex-direction: column;
   padding: 0;
   box-shadow: 6px 0 24px rgba(15, 118, 110, 0.18);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .sidebar-header {
@@ -279,6 +283,7 @@
 /* ─── Main Content ─── */
 .dashboard-main {
   flex: 1;
+  min-width: 0;
   padding: 48px;
   display: flex;
   flex-direction: column;

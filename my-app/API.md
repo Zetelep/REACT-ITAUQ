@@ -2,7 +2,9 @@
 
 > Automated Usability Evaluation System based on ITAUQ (Indonesian Tourism Application Usability Questionnaire)
 
-**Base URL:** `http://localhost:8080` (development)  
+**Base URL Dev:** `http://localhost:8080` (development)
+**Base URL Prod:** `https://itauq.onrender.com`
+
 **Backend:** Go (Gin Framework)  
 **Database:** PostgreSQL (Supabase)  
 **Authentication:** JWT (Supabase Auth) + Link Tokens (public respondents)

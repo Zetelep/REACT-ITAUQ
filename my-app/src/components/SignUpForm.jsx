@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './AuthForm.css'
 import logoItauq from '../assets/icon.png'
+import { api } from '../lib/apiClient'
 
 export default function SignUpForm({ onBackClick }) {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function SignUpForm({ onBackClick }) {
     job: ''
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -17,29 +19,36 @@ export default function SignUpForm({ onBackClick }) {
       ...prev,
       [name]: value
     }))
+    setError('')
   }
 
   const handleSubmit = async () => {
-    if (!formData.email || !formData.fullName || !formData.institution || !formData.job) {
-      alert('Silahkan isi semua kolom')
+    if (!formData.email || !formData.fullName) {
+      setError('Email dan nama lengkap wajib diisi')
       return
     }
-    
+
     setLoading(true)
-    // Simulate form submission
-    setTimeout(() => {
+    setError('')
+    try {
+      await api.post('/applications', {
+        email: formData.email,
+        full_name: formData.fullName,
+        institution: formData.institution || undefined,
+        occupation: formData.job || undefined,
+      }, { public: true })
       alert('Pengajuan sukses, silahkan tunggu email dari kami jika disetujui')
-      setLoading(false)
-      // Reset form
-      setFormData({
-        email: '',
-        fullName: '',
-        institution: '',
-        job: ''
-      })
-      // Redirect back to login
+      setFormData({ email: '', fullName: '', institution: '', job: '' })
       onBackClick()
-    }, 500)
+    } catch (err) {
+      if (err.code === 'DUPLICATE_APPLICATION') {
+        setError('Pengajuan dengan email ini sudah ada dan masih menunggu review.')
+      } else {
+        setError(err.message || 'Gagal mengajukan. Silakan coba lagi.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleKeyDown = (e) => {
@@ -60,6 +69,7 @@ export default function SignUpForm({ onBackClick }) {
         </div>
 
         <div className="auth-form" onKeyDown={handleKeyDown}>
+          {error && <div className="auth-message error">{error}</div>}
           <div className="auth-field">
             <label className="auth-field-label">Email</label>
             <div className="auth-field-input-wrapper">

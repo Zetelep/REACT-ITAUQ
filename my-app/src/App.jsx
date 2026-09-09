@@ -22,6 +22,7 @@ function AppContent() {
       <Route path="/admin/pengajuan-akun" element={session?.user ? <Home /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/manajemen-akun" element={session?.user ? <Home /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/settings" element={session?.user ? <Home /> : <Navigate to="/admin" replace />} />
+      <Route path="/admin/change-password" element={session?.user ? <Home /> : <Navigate to="/admin" replace />} />
       <Route path="*" element={<Navigate to={session?.user ? '/admin/dashboard' : '/'} replace />} />
     </Routes>
   )
