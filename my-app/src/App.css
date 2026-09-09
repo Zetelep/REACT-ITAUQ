@@ -289,7 +289,9 @@
   color: #1b301b;
 }
 
-button {
+/* Scoped to the legacy auth page so these rules do not leak
+   onto the landing page (LandingPage.css owns its own button styles). */
+.auth-page button {
   border: none;
   border-radius: 16px;
   padding: 16px 22px;
@@ -297,14 +299,14 @@ button {
   cursor: pointer;
 }
 
-button.primary {
+.auth-page button.primary {
   width: 100%;
   color: #fff;
   background: linear-gradient(90deg, #1e7c3b 0%, #55c76a 100%);
   box-shadow: 0 16px 34px rgba(30, 124, 59, 0.18);
 }
 
-button.secondary {
+.auth-page button.secondary {
   width: auto;
   padding: 14px 20px;
   background: transparent;
@@ -313,7 +315,7 @@ button.secondary {
   border: 1px solid #cde7d0;
 }
 
-button:hover {
+.auth-page button:hover {
   opacity: 0.96;
 }
 
