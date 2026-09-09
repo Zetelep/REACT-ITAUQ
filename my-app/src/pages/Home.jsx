@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthProvider'
+import { useProfile } from '../contexts/ProfileProvider'
 import dashboardIcon from '../assets/dashboard_30.png'
 import settingsIcon from '../assets/settings_30.png'
 import taskIcon from '../assets/task_30.png'
@@ -19,6 +20,7 @@ import AllEvaluationsPage from './AllEvaluationsPage'
 import AccountRequestsPage from './AccountRequestsPage'
 import AccountManagementPage from './AccountManagementPage'
 import SusEvaluationPage from './SusEvaluationPage'
+import ChangePasswordPage from './ChangePasswordPage'
 
 import './Home.css'
 
@@ -37,11 +39,9 @@ const superAdminPages = [
 
 ]
 
-// Hardcoded super admin check — change this based on profiles roles table later
-const SUPER_ADMIN_EMAILS = ['noro58.12@gmail.com']
-
 export default function Home() {
   const { session, signOut } = useAuth()
+  const { profile, profileLoading } = useProfile()
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -49,6 +49,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false)
 
   const activePage = useMemo(() => {
+    if (location.pathname.startsWith('/admin/change-password')) return 'change-password'
     if (location.pathname.startsWith('/admin/evaluasi-sus')) return 'evaluasi-sus'
     if (location.pathname.startsWith('/admin/semua-evaluasi')) return 'semua-evaluasi'
     if (location.pathname.startsWith('/admin/evaluasi')) return 'evaluasi'
@@ -60,8 +61,7 @@ export default function Home() {
 
   const jwtToken = session?.access_token || ''
 
-  // Hardcoded super admin check — change this based on profiles roles table later
-  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(session?.user?.email)
+  const isSuperAdmin = profile?.role === 'super_admin'
 
   const handleNav = (key) => {
     const targetPage = [...pages, ...superAdminPages].find((page) => page.key === key)
@@ -90,6 +90,10 @@ export default function Home() {
     }
   }
 
+  if (profileLoading) return <div className="app-loading">Loading profile...</div>
+
+  const forceChangePassword = profile?.must_change_password === true
+
   return (
     <div className="dashboard-layout">
       {/* ─── Mobile Top Bar ─── */}
@@ -112,55 +116,61 @@ export default function Home() {
             <img src={logoItauq} alt="ITAUQ logo" className="sidebar-brand-logo" />
             <h2>ITAUQ</h2>
           </div>
-          <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-            <img
-              src={sidebarCollapsed ? arrowForwardIcon : arrowBackIcon}
-              alt=""
-              className="sidebar-toggle-icon"
-            />
-          </button>
-          <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
-            &times;
-          </button>
-        </div>
-        <nav className="sidebar-nav">
-          {pages.map((p) => (
-            <button
-              key={p.key}
-              className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
-              onClick={() => handleNav(p.key)}
-            title={sidebarCollapsed ? p.label : undefined}
-            aria-label={p.label}
-            >
-              <img src={p.icon} alt="" className="sidebar-icon" />
-              <span className="sidebar-label">{p.label}</span>
-            </button>
-          ))}
-
-          {/* ─── Super Admin section ─── */}
-          {isSuperAdmin && (
+          {!forceChangePassword && (
             <>
-              <div className="sidebar-divider">
-                <span className="sidebar-divider-line" />
-                <span className="sidebar-divider-text">Super Admin</span>
-                <span className="sidebar-divider-line" />
-              </div>
-
-              {superAdminPages.map((p) => (
-                <button
-                  key={p.key}
-                  className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
-                  onClick={() => handleNav(p.key)}
-                  title={sidebarCollapsed ? p.label : undefined}
-                  aria-label={p.label}
-                >
-                  <img src={p.icon} alt="" className="sidebar-icon" />
-                  <span className="sidebar-label">{p.label}</span>
-                </button>
-              ))}
+              <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+                <img
+                  src={sidebarCollapsed ? arrowForwardIcon : arrowBackIcon}
+                  alt=""
+                  className="sidebar-toggle-icon"
+                />
+              </button>
+              <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
+                &times;
+              </button>
             </>
           )}
-        </nav>
+        </div>
+        {!forceChangePassword && (
+          <nav className="sidebar-nav">
+            {pages.map((p) => (
+              <button
+                key={p.key}
+                className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
+                onClick={() => handleNav(p.key)}
+              title={sidebarCollapsed ? p.label : undefined}
+              aria-label={p.label}
+              >
+                <img src={p.icon} alt="" className="sidebar-icon" />
+                <span className="sidebar-label">{p.label}</span>
+              </button>
+            ))}
+
+            {/* ─── Super Admin section ─── */}
+            {isSuperAdmin && (
+              <>
+                <div className="sidebar-divider">
+                  <span className="sidebar-divider-line" />
+                  <span className="sidebar-divider-text">Super Admin</span>
+                  <span className="sidebar-divider-line" />
+                </div>
+
+                {superAdminPages.map((p) => (
+                  <button
+                    key={p.key}
+                    className={`sidebar-link${activePage === p.key ? ' active' : ''}`}
+                    onClick={() => handleNav(p.key)}
+                    title={sidebarCollapsed ? p.label : undefined}
+                    aria-label={p.label}
+                  >
+                    <img src={p.icon} alt="" className="sidebar-icon" />
+                    <span className="sidebar-label">{p.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+          </nav>
+        )}
         <div className="sidebar-footer">
           <p className="sidebar-user">{session?.user?.email}</p>
           <button className="sidebar-signout" onClick={handleSignOut} title={sidebarCollapsed ? 'Sign Out' : undefined} aria-label="Sign Out">
@@ -172,19 +182,25 @@ export default function Home() {
 
       {/* ─── Main Content ─── */}
       <main className="dashboard-main">
-        {activePage === 'dashboard' && <DashboardPage />}
-        {activePage === 'evaluasi' && <EvaluationPage />}
-        {activePage === 'semua-evaluasi' && <AllEvaluationsPage />}
-        {activePage === 'evaluasi-sus' && <SusEvaluationPage />}
-        {activePage === 'pengajuan-akun' && <AccountRequestsPage />}
-        {activePage === 'manajemen-akun' && <AccountManagementPage />}
-        {activePage === 'setting' && (
-          <SettingsPage
-            jwtToken={jwtToken}
-            userEmail={session?.user?.email}
-            copied={copied}
-            onCopy={handleCopyJwt}
-          />
+        {forceChangePassword ? (
+          <ChangePasswordPage />
+        ) : (
+          <>
+            {activePage === 'dashboard' && <DashboardPage />}
+            {activePage === 'evaluasi' && <EvaluationPage />}
+            {activePage === 'semua-evaluasi' && <AllEvaluationsPage />}
+            {activePage === 'evaluasi-sus' && <SusEvaluationPage />}
+            {activePage === 'pengajuan-akun' && <AccountRequestsPage />}
+            {activePage === 'manajemen-akun' && <AccountManagementPage />}
+            {activePage === 'setting' && (
+              <SettingsPage
+                jwtToken={jwtToken}
+                userEmail={session?.user?.email}
+                copied={copied}
+                onCopy={handleCopyJwt}
+              />
+            )}
+          </>
         )}
       </main>
     </div>
