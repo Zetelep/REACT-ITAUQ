@@ -1,10 +1,50 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useAuth } from '../../app/providers/AuthProvider'
 import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
+import './SettingsPage.css'
 
-export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
+function getInitials(name, email) {
+  const source = name || email || 'Akun'
+  const words = source.trim().split(/\s+/)
+  return words.length > 1
+    ? `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase()
+    : source.slice(0, 2).toUpperCase()
+}
+
+function formatDate(value) {
+  if (!value) return '—'
+
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(value))
+}
+
+function DetailItem({ label, value, locked = false }) {
+  return (
+    <div className="settings-detail-item">
+      <span className="settings-detail-label">{label}</span>
+      <span className={`settings-detail-value${locked ? ' is-locked' : ''}`}>
+        {value || '—'}
+        {locked && <span className="settings-lock" title="Dikelola oleh sistem">Terkunci</span>}
+      </span>
+    </div>
+  )
+}
+
+export default function SettingsPage() {
+  const { session } = useAuth()
   const { profile, updateProfile, refreshProfile } = useProfile()
+  const userEmail = session?.user?.email || ''
+  const displayName = profile?.full_name || userEmail.split('@')[0] || 'Administrator'
+  const roleLabel = profile?.role === 'super_admin' ? 'Super Admin' : 'Administrator'
+  const isSuperAdmin = profile?.role === 'super_admin'
+
   const [editName, setEditName] = useState('')
+  const [editInstitution, setEditInstitution] = useState('')
+  const [editOccupation, setEditOccupation] = useState('')
   const [editingName, setEditingName] = useState(false)
   const [nameSaving, setNameSaving] = useState(false)
   const [nameError, setNameError] = useState('')
@@ -16,8 +56,22 @@ export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
   const [pwError, setPwError] = useState('')
   const [pwSuccess, setPwSuccess] = useState('')
 
+  useEffect(() => {
+    if (!editingName) {
+      setEditName(profile?.full_name || '')
+      setEditInstitution(profile?.institution || '')
+      setEditOccupation(profile?.occupation || '')
+    }
+  }, [profile?.full_name, profile?.institution, profile?.occupation, editingName])
+
+  const initials = useMemo(() => getInitials(profile?.full_name, userEmail), [profile?.full_name, userEmail])
+  const passwordProgress = Math.min(newPassword.length / 8, 1) * 100
+  const passwordReady = newPassword.length >= 8 && newPassword === confirmPassword
+
   const startEditName = () => {
     setEditName(profile?.full_name || '')
+    setEditInstitution(profile?.institution || '')
+    setEditOccupation(profile?.occupation || '')
     setEditingName(true)
     setNameError('')
     setNameSuccess('')
@@ -25,22 +79,34 @@ export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
 
   const cancelEditName = () => {
     setEditingName(false)
+    setEditName(profile?.full_name || '')
+    setEditInstitution(profile?.institution || '')
+    setEditOccupation(profile?.occupation || '')
     setNameError('')
     setNameSuccess('')
   }
 
-  const saveName = async () => {
-    if (!editName.trim()) {
-      setNameError('Nama tidak boleh kosong.')
+  const saveName = async (event) => {
+    event?.preventDefault()
+    const nextName = editName.trim()
+    if (!nextName) {
+      setNameError('Nama lengkap tidak boleh kosong.')
       return
     }
+
     setNameSaving(true)
     setNameError('')
+    setNameSuccess('')
     try {
-      await updateProfile({ full_name: editName.trim() })
+      const profileData = { full_name: nextName }
+      if (isSuperAdmin) {
+        profileData.institution = editInstitution.trim()
+        profileData.occupation = editOccupation.trim()
+      }
+      await updateProfile(profileData)
       setEditingName(false)
       setNameSuccess('Nama berhasil diperbarui.')
-      setTimeout(() => setNameSuccess(''), 3000)
+      window.setTimeout(() => setNameSuccess(''), 3000)
     } catch (err) {
       setNameError(err.message || 'Gagal memperbarui nama.')
     } finally {
@@ -48,8 +114,8 @@ export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
     }
   }
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault()
+  const handleChangePassword = async (event) => {
+    event.preventDefault()
     setPwError('')
     setPwSuccess('')
 
@@ -69,7 +135,7 @@ export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
       setNewPassword('')
       setConfirmPassword('')
       setPwSuccess('Password berhasil diubah.')
-      setTimeout(() => setPwSuccess(''), 3000)
+      window.setTimeout(() => setPwSuccess(''), 3000)
     } catch (err) {
       setPwError(err.message || 'Gagal mengubah password.')
     } finally {
@@ -78,159 +144,194 @@ export default function SettingsPage({ jwtToken, userEmail, copied, onCopy }) {
   }
 
   return (
-    <div className="settings-content">
-      {/* Profile Section */}
-      <div className="settings-card" style={{ marginBottom: 20 }}>
-        <div className="settings-header">
-          <div>
-            <p className="settings-label">Profil</p>
-            <h1 className="settings-title">Informasi Akun</h1>
-          </div>
+    <div className="settings-page">
+      <header className="settings-hero">
+        <div>
+          <p className="settings-eyebrow">Pengaturan akun</p>
+          <h1 className="settings-page-title">Ruang pribadi Anda</h1>
+          <p className="settings-page-description">
+            Kelola identitas dan keamanan akun administrator Anda dari satu tempat.
+          </p>
         </div>
-
-        <div className="settings-meta">
-          <span className="meta-label">Email</span>
-          <strong>{profile?.email || userEmail || '—'}</strong>
+        <div className="settings-active-pill">
+          <span className="settings-active-dot" aria-hidden="true" />
+          Akun aktif
         </div>
+      </header>
 
-        <div className="settings-meta">
-          <span className="meta-label">Role</span>
-          <span className={`status-badge ${profile?.role === 'super_admin' ? 'badge-approved' : 'badge-pending'}`}>
-            {profile?.role === 'super_admin' ? 'Super Admin' : 'Administrator'}
-          </span>
-        </div>
-
-        {profile?.institution && (
-          <div className="settings-meta">
-            <span className="meta-label">Institusi</span>
-            <strong>{profile.institution}</strong>
-          </div>
-        )}
-
-        {profile?.occupation && (
-          <div className="settings-meta">
-            <span className="meta-label">Pekerjaan</span>
-            <strong>{profile.occupation}</strong>
-          </div>
-        )}
-
-        <div style={{ marginTop: 16 }}>
-          {!editingName ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div className="settings-meta" style={{ margin: 0 }}>
-                <span className="meta-label">Nama Lengkap</span>
-                <strong>{profile?.full_name || '—'}</strong>
-              </div>
-              <button className="copy-btn" style={{ fontSize: '0.82rem', padding: '7px 14px' }} onClick={startEditName}>
-                Edit
-              </button>
+      <div className="settings-bento">
+        <section className="settings-card settings-profile-card">
+          <div className="settings-card-heading">
+            <div>
+              <p className="settings-card-kicker">Profil utama</p>
+              <h2 className="settings-card-title">Identitas akun</h2>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151' }}>Nama Lengkap</label>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <span className="settings-card-symbol" aria-hidden="true">✦</span>
+          </div>
+
+          <div className="settings-profile-summary">
+            <div className="settings-avatar" aria-hidden="true">{initials}</div>
+            <div className="settings-profile-name">
+              <strong>{displayName}</strong>
+              <span>{roleLabel}</span>
+            </div>
+          </div>
+
+          <form className="settings-name-editor" onSubmit={saveName}>
+            <div className="settings-field-label-row">
+              <label htmlFor="settings-full-name">Nama lengkap</label>
+              {!editingName && <button type="button" className="settings-text-button" onClick={startEditName}>{isSuperAdmin ? 'Edit data' : 'Edit nama'}</button>}
+            </div>
+            {editingName ? (
+              <>
                 <input
-                  className="modal-input"
+                  id="settings-full-name"
+                  className="settings-input"
                   type="text"
                   value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') saveName() }}
+                  onChange={(event) => setEditName(event.target.value)}
+                  placeholder="Masukkan nama lengkap"
                   autoFocus
-                  style={{ maxWidth: 300 }}
                 />
-                <button
-                  className="copy-btn"
-                  style={{ fontSize: '0.82rem', padding: '8px 14px' }}
-                  onClick={saveName}
-                  disabled={nameSaving}
-                >
-                  {nameSaving ? '...' : 'Simpan'}
-                </button>
-                <button
-                  className="pagination-btn"
-                  style={{ fontSize: '0.82rem' }}
-                  onClick={cancelEditName}
-                >
-                  Batal
-                </button>
+                {isSuperAdmin && (
+                  <div className="settings-profile-editor-grid">
+                    <div className="settings-field">
+                      <label htmlFor="settings-institution">Institusi</label>
+                      <input
+                        id="settings-institution"
+                        className="settings-input"
+                        type="text"
+                        value={editInstitution}
+                        onChange={(event) => setEditInstitution(event.target.value)}
+                        placeholder="Nama institusi"
+                      />
+                    </div>
+                    <div className="settings-field">
+                      <label htmlFor="settings-occupation">Pekerjaan</label>
+                      <input
+                        id="settings-occupation"
+                        className="settings-input"
+                        type="text"
+                        value={editOccupation}
+                        onChange={(event) => setEditOccupation(event.target.value)}
+                        placeholder="Pekerjaan atau jabatan"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="settings-form-actions">
+                  <button className="settings-primary-button" type="submit" disabled={nameSaving}>
+                    {nameSaving ? 'Menyimpan...' : 'Simpan perubahan'}
+                  </button>
+                  <button className="settings-secondary-button" type="button" onClick={cancelEditName} disabled={nameSaving}>
+                    Batal
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="settings-readonly-field">{profile?.full_name || 'Belum diisi'}</div>
+            )}
+            {nameError && <p className="settings-feedback settings-feedback-error">{nameError}</p>}
+            {nameSuccess && <p className="settings-feedback settings-feedback-success">{nameSuccess}</p>}
+          </form>
+        </section>
+
+        <section className="settings-card settings-account-card">
+          <div className="settings-card-heading">
+            <div>
+              <p className="settings-card-kicker">Detail akun</p>
+              <h2 className="settings-card-title">Data akun</h2>
+            </div>
+            <span className="settings-card-symbol settings-card-symbol--blue" aria-hidden="true">◎</span>
+          </div>
+
+          <div className="settings-detail-grid">
+            <DetailItem label="Email" value={userEmail} locked />
+            <DetailItem label="Peran" value={roleLabel} locked />
+            <DetailItem label="Institusi" value={profile?.institution} locked />
+            <DetailItem label="Pekerjaan" value={profile?.occupation} locked />
+            <DetailItem label="Bergabung sejak" value={formatDate(profile?.created_at)} />
+            <DetailItem label="Status" value={profile?.is_active === false ? 'Nonaktif' : 'Aktif'} />
+          </div>
+
+          <p className="settings-card-note">
+            {isSuperAdmin
+              ? 'Sebagai Super Admin, Anda dapat memperbarui nama, institusi, dan pekerjaan. Email dan peran tetap dilindungi oleh sistem.'
+              : 'Email, peran, institusi, dan pekerjaan dikelola oleh sistem. Hubungi Super Admin jika data tersebut perlu diperbarui.'}
+          </p>
+        </section>
+
+        <section className="settings-card settings-security-card">
+          <div className="settings-card-heading">
+            <div>
+              <p className="settings-card-kicker">Perlindungan akun</p>
+              <h2 className="settings-card-title">Keamanan</h2>
+            </div>
+            <span className="settings-card-symbol settings-card-symbol--orange" aria-hidden="true">⌁</span>
+          </div>
+
+          <div className="settings-security-intro">
+            <div className="settings-security-icon" aria-hidden="true">•••</div>
+            <div>
+              <strong>Perbarui password secara berkala</strong>
+              <p>Gunakan minimal 8 karakter agar akun tetap terlindungi.</p>
+            </div>
+          </div>
+
+          <form className="settings-password-form" onSubmit={handleChangePassword}>
+            {pwError && <div className="settings-feedback settings-feedback-error">{pwError}</div>}
+            {pwSuccess && <div className="settings-feedback settings-feedback-success">{pwSuccess}</div>}
+
+            <div className="settings-field">
+              <label htmlFor="new-password">Password baru</label>
+              <input
+                id="new-password"
+                className="settings-input"
+                type="password"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                placeholder="Minimal 8 karakter"
+                autoComplete="new-password"
+              />
+              <div className="settings-password-meter" aria-hidden="true">
+                <span style={{ width: `${passwordProgress}%` }} />
               </div>
             </div>
-          )}
-          {nameError && <div className="change-pw-error" style={{ marginTop: 10 }}>{nameError}</div>}
-          {nameSuccess && <div style={{ marginTop: 10, color: '#047857', fontSize: '0.88rem' }}>{nameSuccess}</div>}
-        </div>
-      </div>
 
-      {/* Password Change Section */}
-      <div className="settings-card" style={{ marginBottom: 20 }}>
-        <div className="settings-header">
+            <div className="settings-field">
+              <label htmlFor="confirm-password">Konfirmasi password</label>
+              <input
+                id="confirm-password"
+                className="settings-input"
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="Ketik ulang password baru"
+                autoComplete="new-password"
+              />
+            </div>
+
+            <button className="settings-primary-button" type="submit" disabled={pwSaving || !newPassword || !confirmPassword}>
+              {pwSaving ? 'Menyimpan...' : 'Simpan password'}
+            </button>
+            {newPassword && confirmPassword && (
+              <p className={`settings-password-hint${passwordReady ? ' is-ready' : ''}`}>
+                {passwordReady ? 'Password siap disimpan.' : 'Pastikan kedua password sama.'}
+              </p>
+            )}
+          </form>
+        </section>
+
+        <aside className="settings-card settings-help-card">
+          <div className="settings-help-mark" aria-hidden="true">?</div>
           <div>
-            <p className="settings-label">Keamanan</p>
-            <h1 className="settings-title">Ubah Password</h1>
+            <p className="settings-card-kicker">Butuh bantuan?</p>
+            <h2 className="settings-card-title">Data terlindungi</h2>
+            <p className="settings-help-copy">
+              Perubahan nama dan password berlaku untuk sesi akun Anda. Data akses sensitif tidak ditampilkan di halaman ini.
+            </p>
           </div>
-        </div>
-
-        <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
-          {pwError && <div className="change-pw-error">{pwError}</div>}
-          {pwSuccess && <div style={{ color: '#047857', fontSize: '0.88rem', padding: '8px 0' }}>{pwSuccess}</div>}
-
-          <div className="modal-field" style={{ marginBottom: 0 }}>
-            <label>Password Baru</label>
-            <input
-              className="modal-input"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Minimal 8 karakter"
-              autoComplete="new-password"
-            />
-          </div>
-
-          <div className="modal-field" style={{ marginBottom: 0 }}>
-            <label>Konfirmasi Password</label>
-            <input
-              className="modal-input"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Ketik ulang password baru"
-              autoComplete="new-password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="change-pw-btn"
-            disabled={pwSaving}
-            style={{ alignSelf: 'flex-start' }}
-          >
-            {pwSaving ? 'Menyimpan...' : 'Simpan Password'}
-          </button>
-        </form>
-      </div>
-
-      {/* JWT Section */}
-      <div className="settings-card">
-        <div className="settings-header">
-          <div>
-            <p className="settings-label">Developer</p>
-            <h1 className="settings-title">JWT Token</h1>
-          </div>
-          <button className="copy-btn" onClick={onCopy} disabled={!jwtToken}>
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
-
-        <div className="settings-meta">
-          <span className="meta-label">Signed in as</span>
-          <strong>{userEmail || 'No active user'}</strong>
-        </div>
-
-        <div className="jwt-box">
-          <code className="jwt-value">
-            {jwtToken || 'No JWT available. Please log in again.'}
-          </code>
-        </div>
+        </aside>
       </div>
     </div>
   )
