@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
 import './AccountRequestsPage.css'
 
 export default function AccountManagementPage() {
+  const { profile } = useProfile()
+  const isSuperAdmin = profile?.role === 'super_admin'
   const [admins, setAdmins] = useState([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -17,6 +20,8 @@ export default function AccountManagementPage() {
 
   const [formName, setFormName] = useState('')
   const [formEmail, setFormEmail] = useState('')
+  const [formInstitution, setFormInstitution] = useState('')
+  const [formOccupation, setFormOccupation] = useState('')
   const [formActive, setFormActive] = useState(true)
   const [formError, setFormError] = useState('')
 
@@ -51,13 +56,18 @@ export default function AccountManagementPage() {
   const openCreateModal = () => {
     setFormName('')
     setFormEmail('')
+    setFormInstitution('')
+    setFormOccupation('')
     setFormError('')
     setCreateModal(true)
   }
 
   const openEditModal = (admin) => {
+    if (!isSuperAdmin) return
     setEditModal(admin)
     setFormName(admin.full_name || '')
+    setFormInstitution(admin.institution || '')
+    setFormOccupation(admin.occupation || '')
     setFormActive(admin.is_active !== false)
     setFormError('')
   }
@@ -92,10 +102,16 @@ export default function AccountManagementPage() {
       setFormError('Nama tidak boleh kosong.')
       return
     }
+    if (!isSuperAdmin) {
+      setFormError('Hanya Super Admin yang dapat mengubah data administrator.')
+      return
+    }
     setActionLoading('edit')
     try {
       await api.patch(`/administrators/${editModal.id}`, {
         full_name: formName.trim(),
+        institution: formInstitution.trim(),
+        occupation: formOccupation.trim(),
         is_active: formActive,
       })
       setEditModal(null)
@@ -108,7 +124,7 @@ export default function AccountManagementPage() {
   }
 
   const handleDelete = async () => {
-    if (!deleteConfirm) return
+    if (!deleteConfirm || !isSuperAdmin) return
     setActionLoading('delete')
     try {
       await api.del(`/administrators/${deleteConfirm.id}`)
@@ -156,6 +172,7 @@ export default function AccountManagementPage() {
                   <th>Nama</th>
                   <th>Email</th>
                   <th>Institusi</th>
+                  <th>Pekerjaan</th>
                   <th>Status</th>
                   <th>Ubah Password</th>
                   <th>Tanggal</th>
@@ -168,6 +185,7 @@ export default function AccountManagementPage() {
                     <td className="td-name">{admin.full_name}</td>
                     <td>{admin.email}</td>
                     <td>{admin.institution || '—'}</td>
+                    <td>{admin.occupation || '—'}</td>
                     <td>
                       <span className={`status-badge ${admin.is_active !== false ? 'badge-approved' : 'badge-rejected'}`}>
                         {admin.is_active !== false ? 'Aktif' : 'Nonaktif'}
@@ -185,20 +203,24 @@ export default function AccountManagementPage() {
                     </td>
                     <td className="td-actions">
                       <div className="action-btns">
-                        <button
-                          className="action-btn edit"
-                          onClick={() => openEditModal(admin)}
-                          title="Edit"
-                        >
-                          ✏
-                        </button>
-                        <button
-                          className="action-btn delete"
-                          onClick={() => setDeleteConfirm(admin)}
-                          title="Hapus"
-                        >
-                          🗑
-                        </button>
+                        {isSuperAdmin && (
+                          <>
+                            <button
+                              className="action-btn edit"
+                              onClick={() => openEditModal(admin)}
+                              title="Edit data administrator"
+                            >
+                              ✏
+                            </button>
+                            <button
+                              className="action-btn delete"
+                              onClick={() => setDeleteConfirm(admin)}
+                              title="Hapus"
+                            >
+                              🗑
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -289,6 +311,30 @@ export default function AccountManagementPage() {
                   autoFocus
                 />
               </div>
+              {isSuperAdmin && (
+                <>
+                  <div className="modal-field">
+                    <label>Institusi</label>
+                    <input
+                      className="modal-input"
+                      type="text"
+                      value={formInstitution}
+                      onChange={(e) => setFormInstitution(e.target.value)}
+                      placeholder="Nama institusi"
+                    />
+                  </div>
+                  <div className="modal-field">
+                    <label>Pekerjaan</label>
+                    <input
+                      className="modal-input"
+                      type="text"
+                      value={formOccupation}
+                      onChange={(e) => setFormOccupation(e.target.value)}
+                      placeholder="Pekerjaan atau jabatan"
+                    />
+                  </div>
+                </>
+              )}
               <div className="modal-field">
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input
