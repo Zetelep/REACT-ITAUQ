@@ -46,7 +46,6 @@ export default function AdminLayout() {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
-  const [copied, setCopied] = useState(false)
 
   const activePage = useMemo(() => {
     if (location.pathname.startsWith('/admin/change-password')) return 'change-password'
@@ -58,8 +57,6 @@ export default function AdminLayout() {
     if (location.pathname.startsWith('/admin/settings')) return 'setting'
     return 'dashboard'
   }, [location.pathname])
-
-  const jwtToken = session?.access_token || ''
 
   const isSuperAdmin = profile?.role === 'super_admin'
 
@@ -75,18 +72,6 @@ export default function AdminLayout() {
     const confirmed = window.confirm('Are you sure you want to sign out?')
     if (confirmed) {
       await signOut()
-    }
-  }
-
-  const handleCopyJwt = async () => {
-    if (!jwtToken) return
-
-    try {
-      await navigator.clipboard.writeText(jwtToken)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch (error) {
-      console.error('Failed to copy JWT:', error)
     }
   }
 
@@ -192,14 +177,7 @@ export default function AdminLayout() {
             {activePage === 'evaluasi-sus' && <SusEvaluationPage />}
             {activePage === 'pengajuan-akun' && <AccountRequestsPage />}
             {activePage === 'manajemen-akun' && <AccountManagementPage />}
-            {activePage === 'setting' && (
-              <SettingsPage
-                jwtToken={jwtToken}
-                userEmail={session?.user?.email}
-                copied={copied}
-                onCopy={handleCopyJwt}
-              />
-            )}
+            {activePage === 'setting' && <SettingsPage />}
           </>
         )}
       </main>

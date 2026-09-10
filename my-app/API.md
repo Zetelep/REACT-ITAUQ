@@ -348,19 +348,23 @@ Returns the caller's own profile row. The frontend should call this immediately 
 
 #### `PATCH /profiles/me`
 
-Edit the caller's own profile. Only `full_name` is editable here; `role` is Super-Admin-controlled via `/administrators` and email is tied to the Supabase Auth identity.
+Edit the caller's own profile. `full_name`, `institution`, and `occupation` are editable here; `role` is Super-Admin-controlled via `/administrators` and email is tied to the Supabase Auth identity. Supplied string values are trimmed; blank `institution` or `occupation` values clear those fields.
 
 **Auth:** Administrator or Super Admin (Bearer JWT)
 
 **Request Body:**
 ```json
-{ "full_name": "Siti Aminah Putri" }
+{
+  "full_name": "Siti Aminah Putri",
+  "institution": "Universitas XYZ",
+  "occupation": "Peneliti"
+}
 ```
 
 **Response (200 OK):** the updated profile (same shape as `GET /profiles/me`).
 
 **Errors:**
-- `400 VALIDATION_ERROR` - `full_name` is blank or any other field was supplied
+- `400 VALIDATION_ERROR` - `full_name` is blank or the request contains an invalid field
 
 ---
 
@@ -506,7 +510,7 @@ Direct account creation, bypassing the application flow. Useful for Super Admin 
 
 #### `PATCH /administrators/:id`
 
-Update an administrator's `full_name` or activate/deactivate the account. Activation is preferred over hard delete to preserve referential history of their questionnaires/respondents.
+Update an administrator's `full_name`, `institution`, or `occupation`, or activate/deactivate the account. Supplied string values are trimmed; blank `institution` or `occupation` values clear those fields. Activation is preferred over hard delete to preserve referential history of their questionnaires/respondents.
 
 **Auth:** Super Admin only
 
@@ -514,6 +518,8 @@ Update an administrator's `full_name` or activate/deactivate the account. Activa
 ```json
 {
   "full_name": "Siti Aminah Putri",
+  "institution": "Universitas XYZ",
+  "occupation": "Peneliti",
   "is_active": false
 }
 ```
