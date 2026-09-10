@@ -2,9 +2,7 @@
 
 > Automated Usability Evaluation System based on ITAUQ (Indonesian Tourism Application Usability Questionnaire)
 
-**Base URL Dev:** `http://localhost:8080` (development)
-**Base URL Prod:** `https://itauq.onrender.com`
-
+**Base URL:** `http://localhost:8080` (development)  
 **Backend:** Go (Gin Framework)  
 **Database:** PostgreSQL (Supabase)  
 **Authentication:** JWT (Supabase Auth) + Link Tokens (public respondents)
@@ -111,8 +109,8 @@ The backend verifies the JWT signature and looks up the user's role from the `pr
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | Full access to all resources |
-| `administrator` | Access to own resources only |
+| `super_admin` | Full administrative access, including creating and managing evaluation projects they own; may view all resources |
+| `administrator` | Create and manage own resources only |
 | Public (no auth) | Application submission only |
 
 ---
@@ -559,7 +557,9 @@ Evaluation projects for applications. Each questionnaire contains ITAUQ question
 
 Create a new questionnaire.
 
-**Auth:** Administrator (creates as themselves)
+**Auth:** Administrator or Super Admin (creates as themselves)
+
+The questionnaire is always owned by the authenticated caller. The client cannot choose a different `administrator_id`.
 
 **Request Body:**
 ```json
@@ -683,7 +683,7 @@ Get a single questionnaire by ID.
 
 Update a questionnaire (partial update).
 
-**Auth:** Owning Administrator only
+**Auth:** Owning Administrator or Super Admin (the caller must own the questionnaire)
 
 **Request Body (any subset):**
 ```json
@@ -731,7 +731,7 @@ Update a questionnaire (partial update).
 
 Delete a questionnaire and all related data (cascades to task scenarios).
 
-**Auth:** Owning Administrator only
+**Auth:** Owning Administrator or Super Admin (the caller must own the questionnaire)
 
 **Response:** `204 No Content`
 
@@ -750,7 +750,7 @@ Tasks that respondents must complete during evaluation. Nested under questionnai
 
 Create a new task scenario under a questionnaire.
 
-**Auth:** Administrator (must own the questionnaire)
+**Auth:** Administrator or Super Admin (must own the questionnaire)
 
 **URL Parameters:**
 | Param | Type | Description |
@@ -866,7 +866,7 @@ Get a single task scenario by ID.
 
 Update a task scenario (partial update).
 
-**Auth:** Owning Administrator (ownership resolved via parent questionnaire)
+**Auth:** Owning Administrator or Super Admin (ownership resolved via parent questionnaire)
 
 **Request Body (any subset):**
 ```json
@@ -908,7 +908,7 @@ Update a task scenario (partial update).
 
 Delete a task scenario.
 
-**Auth:** Owning Administrator
+**Auth:** Owning Administrator or Super Admin
 
 **Response:** `204 No Content`
 
@@ -919,7 +919,7 @@ Delete a task scenario.
 
 ### 5b. Eligibility Criteria (Terms & Conditions Checklist)
 
-Administrator-defined statements (e.g. domicile, citizenship, age group) that a respondent must tick before being allowed to fill in their identity on `POST /public/evaluation/:token/respondents`. Unlike the fixed ITAUQ / SUS instruments, criteria are stored in the database and managed per questionnaire. See `questionnaire_eligibility_criteria` and `respondent_eligibility_confirmations` in the schema.
+Administrator- or Super-Admin-defined statements (e.g. domicile, citizenship, age group) that a respondent must tick before being allowed to fill in their identity on `POST /public/evaluation/:token/respondents`. Unlike the fixed ITAUQ / SUS instruments, criteria are stored in the database and managed per questionnaire. See `questionnaire_eligibility_criteria` and `respondent_eligibility_confirmations` in the schema.
 
 If a questionnaire has **zero** criteria, the public-flow gate is skipped entirely (backward-compatible with legacy links). If it has at least one, every active criterion must appear in the respondent's `checked_criteria_ids` — partial coverage is rejected with `422 ELIGIBILITY_NOT_CONFIRMED`.
 
@@ -931,7 +931,7 @@ Nested under questionnaires for list/create; top-level for get/update/delete by 
 
 Create a new eligibility statement under a questionnaire.
 
-**Auth:** Administrator (must own the questionnaire)
+**Auth:** Administrator or Super Admin (must own the questionnaire)
 
 **URL Parameters:**
 | Param | Type | Description |
@@ -1029,7 +1029,7 @@ Get a single eligibility criterion by ID.
 
 Update an eligibility criterion (partial update). Ownership is resolved via the criterion's parent questionnaire.
 
-**Auth:** Owning Administrator
+**Auth:** Owning Administrator or Super Admin
 
 **Request Body (any subset):**
 ```json
@@ -1057,7 +1057,7 @@ Update an eligibility criterion (partial update). Ownership is resolved via the 
 
 Delete an eligibility criterion. Confirmation rows referencing the criterion are removed by `ON DELETE CASCADE` from the criterion.
 
-**Auth:** Owning Administrator
+**Auth:** Owning Administrator or Super Admin
 
 **Response:** `204 No Content`
 
@@ -1075,7 +1075,7 @@ Public links that let respondents access a questionnaire without logging in. Nes
 
 Generate a new public token/link for a questionnaire.
 
-**Auth:** Administrator (must own the questionnaire — Super Admin cannot create on behalf of another administrator)
+**Auth:** Administrator or Super Admin (must own the questionnaire — Super Admin cannot create on behalf of another administrator)
 
 **URL Parameters:**
 | Param | Type | Description |
@@ -1169,7 +1169,7 @@ List all evaluation links for a questionnaire, newest first.
 
 Deactivate/reactivate a link or change its expiry.
 
-**Auth:** Owning Administrator (ownership resolved via parent questionnaire)
+**Auth:** Owning Administrator or Super Admin (ownership resolved via parent questionnaire)
 
 **Request Body (any subset):**
 ```json
@@ -1203,7 +1203,7 @@ Deactivate/reactivate a link or change its expiry.
 
 **Errors:**
 - `400 VALIDATION_ERROR` - `expires_at` is in the past or malformed body
-- `403 FORBIDDEN` - Not the owning administrator
+- `403 FORBIDDEN` - Not the owner of the questionnaire
 - `404 NOT_FOUND` - Evaluation link not found
 
 ---
@@ -1212,12 +1212,12 @@ Deactivate/reactivate a link or change its expiry.
 
 Delete an evaluation link.
 
-**Auth:** Owning Administrator
+**Auth:** Owning Administrator or Super Admin
 
 **Response:** `204 No Content`
 
 **Errors:**
-- `403 FORBIDDEN` - Not the owning administrator
+- `403 FORBIDDEN` - Not the owner of the questionnaire
 - `404 NOT_FOUND` - Evaluation link not found
 
 ---
@@ -1902,25 +1902,25 @@ Aggregate report across **all** respondents of one questionnaire — the "Genera
 | `GET /applications/:id` | ✅ | - | - |
 | `PATCH /applications/:id/approve` | ✅ | - | - |
 | `PATCH /applications/:id/reject` | ✅ | - | - |
-| `POST /questionnaires` | - | ✅ | - |
+| `POST /questionnaires` | ✅ (own) | ✅ (own) | - |
 | `GET /questionnaires` | ✅ (all) | ✅ (own) | - |
 | `GET /questionnaires/:id` | ✅ | ✅ (own) | - |
-| `PATCH /questionnaires/:id` | - | ✅ (own) | - |
-| `DELETE /questionnaires/:id` | - | ✅ (own) | - |
-| `POST /questionnaires/:id/task-scenarios` | - | ✅ (own) | - |
+| `PATCH /questionnaires/:id` | ✅ (own) | ✅ (own) | - |
+| `DELETE /questionnaires/:id` | ✅ (own) | ✅ (own) | - |
+| `POST /questionnaires/:id/task-scenarios` | ✅ (own) | ✅ (own) | - |
 | `GET /questionnaires/:id/task-scenarios` | ✅ | ✅ (own) | - |
 | `GET /task-scenarios/:id` | ✅ | ✅ (own) | - |
-| `PATCH /task-scenarios/:id` | - | ✅ (own) | - |
-| `DELETE /task-scenarios/:id` | - | ✅ (own) | - |
-| `POST /questionnaires/:id/eligibility-criteria` | - | ✅ (own) | - |
+| `PATCH /task-scenarios/:id` | ✅ (own) | ✅ (own) | - |
+| `DELETE /task-scenarios/:id` | ✅ (own) | ✅ (own) | - |
+| `POST /questionnaires/:id/eligibility-criteria` | ✅ (own) | ✅ (own) | - |
 | `GET /questionnaires/:id/eligibility-criteria` | ✅ | ✅ (own) | - |
 | `GET /eligibility-criteria/:id` | ✅ | ✅ (own) | - |
-| `PATCH /eligibility-criteria/:id` | - | ✅ (own) | - |
-| `DELETE /eligibility-criteria/:id` | - | ✅ (own) | - |
-| `POST /questionnaires/:id/evaluation-links` | - | ✅ (own) | - |
+| `PATCH /eligibility-criteria/:id` | ✅ (own) | ✅ (own) | - |
+| `DELETE /eligibility-criteria/:id` | ✅ (own) | ✅ (own) | - |
+| `POST /questionnaires/:id/evaluation-links` | ✅ (own) | ✅ (own) | - |
 | `GET /questionnaires/:id/evaluation-links` | ✅ | ✅ (own) | - |
-| `PATCH /evaluation-links/:id` | - | ✅ (own) | - |
-| `DELETE /evaluation-links/:id` | - | ✅ (own) | - |
+| `PATCH /evaluation-links/:id` | ✅ (own) | ✅ (own) | - |
+| `DELETE /evaluation-links/:id` | ✅ (own) | ✅ (own) | - |
 | `GET /public/evaluation/:token` | - | - | ✅ |
 | `GET /instruments/itauq` | ✅ | ✅ | - |
 | `GET /instruments/sus` | ✅ | ✅ | - |
