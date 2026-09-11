@@ -4,6 +4,7 @@ import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
 import '../account-management/AccountRequestsPage.css'
 import './QuestionnairePage.css'
+import EvaluationLinksSection from './EvaluationLinksSection'
 
 const PAGE_SIZE = 20
 const STATUS_OPTIONS = [
@@ -199,54 +200,81 @@ function QuestionnaireList({ superAdminView }) {
 
       {error && <div className="page-error" role="alert">{error}</div>}
 
-      <div className="data-table-card">
+      <div className="evaluation-summary-grid" aria-label="Ringkasan evaluasi">
+        <article className="evaluation-stat-card evaluation-stat-featured">
+          <span className="evaluation-stat-label">Terlihat</span>
+          <strong>{questionnaires.length}</strong>
+          <small>evaluasi di halaman ini</small>
+          <span className="evaluation-stat-mark" aria-hidden="true">01</span>
+        </article>
+        <article className="evaluation-stat-card">
+          <span className="evaluation-stat-label">Aktif</span>
+          <strong>{questionnaires.filter((item) => item.status === 'active').length}</strong>
+          <small>siap menerima respons</small>
+          <span className="evaluation-stat-dot is-active" aria-hidden="true" />
+        </article>
+        <article className="evaluation-stat-card">
+          <span className="evaluation-stat-label">Draft</span>
+          <strong>{questionnaires.filter((item) => item.status === 'draft').length}</strong>
+          <small>masih dalam persiapan</small>
+          <span className="evaluation-stat-dot is-draft" aria-hidden="true" />
+        </article>
+        <article className="evaluation-stat-card">
+          <span className="evaluation-stat-label">Selesai</span>
+          <strong>{questionnaires.filter((item) => item.status === 'closed').length}</strong>
+          <small>evaluasi yang ditutup</small>
+          <span className="evaluation-stat-dot is-closed" aria-hidden="true" />
+        </article>
+      </div>
+
+      <section className="data-table-card evaluation-board">
+        <div className="evaluation-board-header">
+          <div>
+            <p className="board-eyebrow">Workspace</p>
+            <h2>Daftar evaluasi</h2>
+            <p>Pilih evaluasi untuk mengatur task, kriteria, dan tautan responden.</p>
+          </div>
+          <span className="board-count">{questionnaires.length} item</span>
+        </div>
+
         {loading ? (
           <div className="table-loading">Memuat daftar evaluasi...</div>
         ) : questionnaires.length === 0 ? (
           <div className="table-empty">
+            <span className="empty-state-icon" aria-hidden="true">＋</span>
             <strong>Belum ada evaluasi.</strong>
             <span>{canCreate ? 'Buat evaluasi pertama untuk mulai menyiapkan proyek.' : 'Tidak ada evaluasi yang sesuai dengan filter.'}</span>
           </div>
         ) : (
-          <div className="table-scroll">
-            <table className="data-table questionnaire-table">
-              <thead>
-                <tr>
-                  <th>Judul</th>
-                  <th>Aplikasi</th>
-                  {superAdminView && <th>Administrator</th>}
-                  <th>Status</th>
-                  <th>Versi ITAUQ</th>
-                  <th>Dibuat</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {questionnaires.map((questionnaire) => (
-                  <tr key={questionnaire.id}>
-                    <td>
-                      <button className="table-link" onClick={() => navigate(detailPath(questionnaire.id))}>
-                        {questionnaire.title}
-                      </button>
-                      {questionnaire.description && <small className="table-description">{questionnaire.description}</small>}
-                    </td>
-                    <td>{questionnaire.app_name}</td>
-                    {superAdminView && <td className="id-cell">{questionnaire.administrator_id || '—'}</td>}
-                    <td><span className={`status-badge ${statusClass(questionnaire.status)}`}>{statusLabel(questionnaire.status)}</span></td>
-                    <td>{questionnaire.itauq_version || 'itauq-v1'}</td>
-                    <td className="td-date">{formatDate(questionnaire.created_at)}</td>
-                    <td className="td-actions">
-                      <div className="action-btns">
-                        <button className="action-btn edit" onClick={() => navigate(detailPath(questionnaire.id))} title="Buka detail">→</button>
-                        {canManageQuestionnaire(questionnaire) && (
-                          <button className="action-btn delete" onClick={() => setDeleteConfirm(questionnaire)} title="Hapus evaluasi">🗑</button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="evaluation-card-grid">
+            {questionnaires.map((questionnaire, index) => (
+              <article className="evaluation-card" key={questionnaire.id}>
+                <div className="evaluation-card-topline">
+                  <span className="evaluation-card-index">{String(index + 1).padStart(2, '0')}</span>
+                  <span className={`status-badge ${statusClass(questionnaire.status)}`}>{statusLabel(questionnaire.status)}</span>
+                  {canManageQuestionnaire(questionnaire) && (
+                    <button className="evaluation-card-delete" onClick={() => setDeleteConfirm(questionnaire)} title="Hapus evaluasi" aria-label={`Hapus ${questionnaire.title}`}>
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  )}
+                </div>
+                <div className="evaluation-card-content">
+                  <p className="evaluation-card-app">{questionnaire.app_name || 'Aplikasi belum diisi'}</p>
+                  <button className="table-link evaluation-card-title" onClick={() => navigate(detailPath(questionnaire.id))}>
+                    {questionnaire.title}
+                  </button>
+                  {questionnaire.description && <p className="table-description">{questionnaire.description}</p>}
+                </div>
+                <div className="evaluation-card-meta">
+                  <span><small>Versi</small><strong>{questionnaire.itauq_version || 'itauq-v1'}</strong></span>
+                  <span><small>Dibuat</small><strong>{formatDate(questionnaire.created_at)}</strong></span>
+                  {superAdminView && <span className="evaluation-card-owner"><small>Administrator</small><strong>{questionnaire.administrator_id || '—'}</strong></span>}
+                </div>
+                <button className="evaluation-card-open" onClick={() => navigate(detailPath(questionnaire.id))}>
+                  Kelola evaluasi <span aria-hidden="true">↗</span>
+                </button>
+              </article>
+            ))}
           </div>
         )}
 
@@ -261,7 +289,7 @@ function QuestionnaireList({ superAdminView }) {
             </button>
           </div>
         )}
-      </div>
+      </section>
 
       {createModal && (
         <QuestionnaireModal
@@ -302,7 +330,21 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
   const [dragState, setDragState] = useState(null)
   const [dropTarget, setDropTarget] = useState(null)
   const canManage = profile?.role === 'administrator' || questionnaire?.administrator_id === profile?.id
+  const canViewEvaluationLinks = profile?.role === 'super_admin' || questionnaire?.administrator_id === profile?.id
+  const canCreateEvaluationLink = questionnaire?.administrator_id === profile?.id
+  const canManageEvaluationLinks = profile?.role === 'super_admin' || questionnaire?.administrator_id === profile?.id
   const backPath = superAdminView ? '/admin/semua-evaluasi' : '/admin/evaluasi'
+  const hasTasks = tasks.length > 0
+  const setupPriorityTitle = !canManage
+    ? 'Tinjau konfigurasi evaluasi'
+    : hasTasks
+      ? 'Evaluasi siap dibagikan'
+      : 'Tambahkan task scenario'
+  const setupPriorityDescription = !canManage
+    ? 'Periksa susunan evaluasi dan tautan publik dari panel di bawah.'
+    : hasTasks
+      ? 'Task sudah tersedia. Kriteria bersifat opsional, lalu buat link publik untuk responden.'
+      : 'Task adalah langkah inti yang akan dikerjakan responden pada alur evaluasi.'
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -454,23 +496,8 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
       <button className="back-link" onClick={() => navigate(backPath)}>← Kembali ke daftar evaluasi</button>
       {error && <div className="page-error" role="alert">{error}</div>}
 
-      <section className="setup-flow" aria-label="Alur penyiapan evaluasi">
-        <div className="setup-flow-heading">
-          <div>
-            <p className="page-eyebrow">Setup Evaluasi</p>
-            <h2>Siapkan evaluasi Anda</h2>
-          </div>
-          <p className="setup-flow-help">Tambahkan task dan kriteria sesuai kebutuhan sebelum membagikan evaluasi kepada responden.</p>
-        </div>
-        <div className="setup-steps">
-          <SetupStep number="1" title="Kuesioner" description="Informasi aplikasi" complete />
-          <SetupStep number="2" title="Task Scenario" description={`${tasks.length} task ditambahkan`} active={canManage && tasks.length === 0} complete={tasks.length > 0} />
-          <SetupStep number="3" title="Kriteria" description={criteria.length > 0 ? `${criteria.length} kriteria ditambahkan` : 'Opsional'} active={canManage && tasks.length > 0 && criteria.length === 0} complete={criteria.length > 0} />
-        </div>
-      </section>
-
       <section className="detail-hero">
-        <div>
+        <div className="detail-hero-copy">
           <div className="detail-kicker">{questionnaire.app_name}</div>
           <h1>{questionnaire.title}</h1>
           <p>{questionnaire.description || 'Belum ada deskripsi evaluasi.'}</p>
@@ -481,25 +508,51 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
           </div>
         </div>
         {canManage && (
-          <button className="primary-btn-sm detail-edit-btn" onClick={() => setQuestionnaireModal(true)}>Edit Evaluasi</button>
+          <button className="primary-btn-sm detail-edit-btn" onClick={() => setQuestionnaireModal(true)}>Edit Informasi</button>
         )}
+      </section>
+
+      <section className="setup-flow" aria-label="Alur penyiapan evaluasi">
+        <div className="setup-flow-heading">
+          <div>
+            <p className="page-eyebrow">Setup Evaluasi</p>
+            <h2>Susun alur responden dari atas ke bawah</h2>
+            <p className="setup-flow-intro">Mulai dari informasi aplikasi, lalu susun task yang akan dikerjakan responden. Setelah itu, tambahkan kriteria kelayakan bila diperlukan dan bagikan link publik saat evaluasi siap digunakan.</p>
+          </div>
+          <div className="setup-priority">
+            <span className="setup-priority-label">Prioritas berikutnya</span>
+            <strong>{setupPriorityTitle}</strong>
+            <p>{setupPriorityDescription}</p>
+            {canManage && !hasTasks && <button className="setup-priority-action" type="button" onClick={() => setTaskModal({})}>+ Tambah Task</button>}
+            {hasTasks && canViewEvaluationLinks && <a className="setup-priority-action" href="#evaluation-links">{canCreateEvaluationLink ? 'Atur link publik' : 'Lihat link publik'} ↗</a>}
+          </div>
+        </div>
+        <div className="setup-steps">
+          <SetupStep number="1" title="Info evaluasi" description="Judul, aplikasi, dan status" complete />
+          <SetupStep number="2" title="Task scenario" description={`${tasks.length} task ditambahkan`} active={canManage && !hasTasks} complete={hasTasks} />
+          <SetupStep number="3" title="Kriteria" description={criteria.length > 0 ? `${criteria.length} kriteria ditambahkan` : 'Opsional · bisa dilewati'} active={false} complete={criteria.length > 0} optional={!criteria.length} />
+          <SetupStep number="4" title="Link publik" description={canCreateEvaluationLink ? 'Bagikan ke responden' : canViewEvaluationLinks ? 'Kelola link responden' : 'Tersedia setelah setup'} active={canCreateEvaluationLink && hasTasks} />
+        </div>
+        <div className="setup-flow-note"><span aria-hidden="true">i</span><span>ITAUQ {questionnaire.itauq_version || 'itauq-v1'} otomatis tersedia untuk setiap evaluasi; tidak perlu dikonfigurasi manual.</span></div>
       </section>
 
       <div className="detail-grid">
         <ResourceSection
+          tone="primary"
+          eyebrow="Langkah inti"
           title="Task Scenario"
           description="Langkah yang harus diselesaikan responden selama evaluasi. Seret kartu untuk mengubah urutan."
-          emptyText="Belum ada task scenario."
+          emptyText="Belum ada task scenario. Tambahkan setidaknya satu alur yang ingin diuji."
           addLabel="+ Tambah Task"
           canManage={canManage}
-          onAdd={() => setTaskModal({})}
+          onAdd={() => setTaskModal({ task_order: tasks.length + 1 })}
         >
           {tasks.length > 0 && (
             <div className="resource-list">
-              {tasks.map((task) => (
+              {tasks.map((task, index) => (
                 <ResourceCard
                   key={task.id}
-                  number={task.task_order}
+                  number={index + 1}
                   title={task.title}
                   description={task.instruction}
                   draggable={canManage && !actionLoading}
@@ -521,9 +574,11 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
         </ResourceSection>
 
         <ResourceSection
+          tone="optional"
+          eyebrow="Opsional"
           title="Kriteria Kelayakan"
           description="Pernyataan yang harus disetujui responden sebelum mengisi identitas. Seret kartu untuk mengubah urutan."
-          emptyText="Tidak ada kriteria. Gate kelayakan tidak akan ditampilkan ke responden."
+          emptyText="Tidak ada kriteria. Gate kelayakan akan dilewati oleh responden."
           addLabel="+ Tambah Kriteria"
           canManage={canManage}
           onAdd={() => setCriteriaModal({})}
@@ -553,6 +608,13 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
           )}
         </ResourceSection>
       </div>
+
+      <EvaluationLinksSection
+        questionnaireId={questionnaireId}
+        canView={canViewEvaluationLinks}
+        canCreate={canCreateEvaluationLink}
+        canManage={canManageEvaluationLinks}
+      />
 
       {questionnaireModal && (
         <QuestionnaireModal
@@ -593,21 +655,22 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
   )
 }
 
-function SetupStep({ number, title, description, active, complete }) {
+function SetupStep({ number, title, description, active, complete, optional }) {
   return (
-    <div className={`setup-step${active ? ' active' : ''}${complete ? ' complete' : ''}`}>
+    <div className={`setup-step${active ? ' active' : ''}${complete ? ' complete' : ''}${optional ? ' optional' : ''}`}>
       <span className="setup-step-number">{complete ? '✓' : number}</span>
       <span className="setup-step-copy"><strong>{title}</strong><small>{description}</small></span>
     </div>
   )
 }
 
-function ResourceSection({ title, description, emptyText, addLabel, canManage, onAdd, children }) {
+function ResourceSection({ tone = 'default', eyebrow, title, description, emptyText, addLabel, canManage, onAdd, children }) {
   const hasChildren = Boolean(children)
   return (
-    <section className="resource-section">
+    <section className={`resource-section resource-section-${tone}`}>
       <div className="resource-section-header">
         <div>
+          {eyebrow && <span className="resource-section-eyebrow">{eyebrow}</span>}
           <h2>{title}</h2>
           <p>{description}</p>
         </div>
@@ -683,7 +746,7 @@ function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
 }
 
 function TaskModal({ task, onClose, onSubmit, submitting }) {
-  const [form, setForm] = useState({ title: task?.title || '', instruction: task?.instruction || '', task_order: task?.task_order ?? 0 })
+  const [form, setForm] = useState({ title: task?.title || '', instruction: task?.instruction || '', task_order: task?.task_order ?? 1 })
   const [error, setError] = useState('')
   const submit = async (event) => {
     event.preventDefault()
@@ -693,7 +756,7 @@ function TaskModal({ task, onClose, onSubmit, submitting }) {
     }
     setError('')
     try {
-      await onSubmit({ title: form.title.trim(), instruction: form.instruction.trim(), task_order: Number(form.task_order) || 0 })
+      await onSubmit({ title: form.title.trim(), instruction: form.instruction.trim(), task_order: Math.max(1, Number(form.task_order) || 1) })
     } catch (err) {
       setError(err.message || 'Gagal menyimpan task scenario.')
     }
@@ -704,7 +767,7 @@ function TaskModal({ task, onClose, onSubmit, submitting }) {
         {error && <div className="change-pw-error modal-error">{error}</div>}
         <div className="modal-field"><label htmlFor="task-title">Judul Task</label><input id="task-title" className="modal-input" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} autoFocus /></div>
         <div className="modal-field"><label htmlFor="task-instruction">Instruksi</label><textarea id="task-instruction" className="modal-textarea" value={form.instruction} onChange={(event) => setForm((current) => ({ ...current, instruction: event.target.value }))} rows={4} /></div>
-        <div className="modal-field"><label htmlFor="task-order">Urutan Tampilan</label><input id="task-order" className="modal-input" type="number" min="0" step="1" value={form.task_order} onChange={(event) => setForm((current) => ({ ...current, task_order: event.target.value }))} /></div>
+        <div className="modal-field"><label htmlFor="task-order">Urutan Tampilan</label><input id="task-order" className="modal-input" type="number" min="1" step="1" value={form.task_order} onChange={(event) => setForm((current) => ({ ...current, task_order: event.target.value }))} /></div>
         <ModalActions onClose={onClose} submitting={submitting} submitLabel={task ? 'Simpan Perubahan' : 'Tambah Task'} />
       </form>
     </Modal>
