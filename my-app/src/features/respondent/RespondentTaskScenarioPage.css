@@ -569,6 +569,79 @@
   font-size: 1.15rem;
 }
 
+/* Interstitial dialog (between tasks) */
+.task-interstitial-dialog {
+  text-align: center;
+}
+
+.task-interstitial-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.task-interstitial-result[data-success="true"] {
+  background: var(--task-primary-soft);
+  color: var(--task-primary);
+}
+
+.task-interstitial-result[data-success="false"] {
+  background: #fef3e5;
+  color: #b87333;
+}
+
+.task-interstitial-result-icon {
+  font-size: 1rem;
+}
+
+.task-interstitial-duration {
+  margin: 12px 0 0;
+  color: var(--task-ink-soft);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.task-interstitial-dialog h2 {
+  margin: 12px 0 0;
+}
+
+.task-interstitial-next-label {
+  margin: 20px 0 0;
+  color: var(--task-ink-soft);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.task-interstitial-next-task {
+  margin: 10px auto 0;
+  max-width: 340px;
+  border: 1px solid var(--task-line);
+  border-radius: 12px;
+  background: #f7fbf9;
+  padding: 14px 18px;
+  text-align: left;
+}
+
+.task-interstitial-next-task strong {
+  display: block;
+  color: var(--task-primary);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.task-interstitial-next-task p {
+  margin: 4px 0 0;
+  color: var(--task-ink);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 .task-completion-page {
   display: grid;
   min-height: 100vh;

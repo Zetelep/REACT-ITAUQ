@@ -66,6 +66,7 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   const [note, setNote] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [isStarted, setIsStarted] = useState(false)
+  const [lastResult, setLastResult] = useState(null)
   const [error, setError] = useState('')
   const [websiteNotice, setWebsiteNotice] = useState('')
   const currentTask = tasks[currentIndex]
@@ -132,14 +133,21 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
         return
       }
 
+      setLastResult({ success: isSuccess, duration: elapsedSeconds })
       setCurrentIndex((index) => index + 1)
       setNote('')
       setWebsiteNotice('')
+      setIsStarted(false)
     } catch (requestError) {
       setError(getErrorMessage(requestError))
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleStartNext = () => {
+    setLastResult(null)
+    setIsStarted(true)
   }
 
   const progressWidth = `${(completedCount / tasks.length) * 100}%`
@@ -236,22 +244,42 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
 
       {!isStarted && (
         <div className="task-start-overlay" role="presentation">
-          <section className="task-start-dialog" role="dialog" aria-modal="true" aria-labelledby="task-start-heading" aria-describedby="task-start-description">
-            <div className="task-start-icon" aria-hidden="true">◷</div>
-            <span className="task-eyebrow">Persiapan tugas</span>
-            <h2 id="task-start-heading">Siap memulai skenario?</h2>
-            <p id="task-start-description">
-              Timer akan mulai berjalan setelah Anda menekan tombol mulai. Baca instruksi terlebih dahulu, lalu buka website yang akan dievaluasi.
-            </p>
-            <ul className="task-start-checklist">
-              <li>Ikuti instruksi skenario sesuai urutan.</li>
-              <li>Kembali ke halaman ini setelah tugas selesai.</li>
-              <li>Pilih gagal jika Anda mengalami kendala teknis.</li>
-            </ul>
-            <button className="task-start-button" type="button" onClick={() => setIsStarted(true)}>
-              Mulai Skenario <span aria-hidden="true">→</span>
-            </button>
-          </section>
+          {lastResult ? (
+            <section className="task-start-dialog task-interstitial-dialog" role="dialog" aria-modal="true" aria-labelledby="task-interstitial-heading">
+              <div className="task-interstitial-result" data-success={lastResult.success}>
+                <span className="task-interstitial-result-icon" aria-hidden="true">{lastResult.success ? '✓' : '△'}</span>
+                <span>{lastResult.success ? 'Tugas Selesai' : 'Tugas Gagal'}</span>
+              </div>
+              <p className="task-interstitial-duration">Waktu: {formatDuration(lastResult.duration)}</p>
+              <h2 id="task-interstitial-heading">Tugas {String(currentIndex).padStart(2, '0')} selesai</h2>
+              <p className="task-interstitial-next-label">Tugas selanjutnya:</p>
+              <div className="task-interstitial-next-task">
+                <strong>TASK SCENARIO {String(currentIndex + 1).padStart(2, '0')}</strong>
+                <p>{currentTask.title || `Skenario tugas ${currentIndex + 1}`}</p>
+              </div>
+              <button className="task-start-button" type="button" onClick={handleStartNext}>
+                Mulai Tugas Berikutnya <span aria-hidden="true">→</span>
+              </button>
+            </section>
+          ) : (
+            <section className="task-start-dialog" role="dialog" aria-modal="true" aria-labelledby="task-start-heading" aria-describedby="task-start-description">
+              <div className="task-start-icon" aria-hidden="true">◷</div>
+              <span className="task-eyebrow">Persiapan tugas</span>
+              <h2 id="task-start-heading">Siap memulai skenario?</h2>
+              <p id="task-start-description">
+                Instruksi tugas ditampilkan di panel kiri. Tekan tombol mulai untuk mengaktifkan timer, lalu buka website evaluasi di tab baru atau perangkat lain melalui tombol di bawah.
+              </p>
+              <ul className="task-start-checklist">
+                <li>Baca instruksi skenario di panel kiri sebelum memulai.</li>
+                <li>Buka website evaluasi di tab baru atau perangkat lain.</li>
+                <li>Kembali ke halaman ini untuk menandai tugas selesai atau gagal.</li>
+                <li>Pilih "Saya Gagal Menyelesaikan" jika mengalami kendala teknis.</li>
+              </ul>
+              <button className="task-start-button" type="button" onClick={() => setIsStarted(true)}>
+                Mulai Skenario <span aria-hidden="true">→</span>
+              </button>
+            </section>
+          )}
         </div>
       )}
     </main>
