@@ -37,8 +37,9 @@ function normalizedToRaw(normalized) {
 
 function formatDuration(seconds) {
   if (seconds == null || seconds <= 0) return '—'
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
+  const totalSeconds = Math.round(seconds)
+  const m = Math.floor(totalSeconds / 60)
+  const s = totalSeconds % 60
   return `${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`
 }
 
@@ -252,6 +253,7 @@ function ReportDetail({ questionnaireId }) {
   const [respondentsMeta, setRespondentsMeta] = useState(null)
   const [respPage, setRespPage] = useState(1)
   const [selectedRespondent, setSelectedRespondent] = useState(null)
+  const [taskStats, setTaskStats] = useState([])
   const [loading, setLoading] = useState(true)
   const [respLoading, setRespLoading] = useState(false)
   const [error, setError] = useState('')
@@ -275,6 +277,9 @@ function ReportDetail({ questionnaireId }) {
       setRespondents(respondentItems)
       setRespondentsMeta(respondentResult?.meta || null)
       setRespPage(1)
+
+      const statsData = await api.get(`/questionnaires/${questionnaireId}/task-scenarios/stats`)
+      setTaskStats(Array.isArray(statsData?.task_scenarios) ? statsData.task_scenarios : [])
     } catch (err) {
       setError(err.message || 'Gagal memuat laporan evaluasi.')
     } finally {
@@ -382,15 +387,9 @@ function ReportDetail({ questionnaireId }) {
                   </thead>
                   <tbody>
                     {tasks.map((task) => {
-                      const taskAttempts = respondents
-                        .flatMap((r) => r.task_results || [])
-                        .filter((tr) => tr.task_scenario_id === task.id)
-                      const successCount = taskAttempts.filter((tr) => tr.is_success === true).length
-                      const totalCount = taskAttempts.length
-                      const rate = totalCount > 0 ? (successCount / totalCount) * 100 : null
-                      const avgTime = totalCount > 0
-                        ? Math.round(taskAttempts.reduce((sum, tr) => sum + (tr.duration_seconds || 0), 0) / totalCount)
-                        : null
+                      const stats = taskStats.find((s) => s.task_scenario_id === task.id)
+                      const avgTime = stats?.avg_completion_time ?? null
+                      const rate = stats?.completion_rate ?? null
                       return (
                         <tr key={task.id}>
                           <td>
