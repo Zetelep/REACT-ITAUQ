@@ -270,9 +270,16 @@ function QuestionnaireList({ superAdminView }) {
                   <span><small>Dibuat</small><strong>{formatDate(questionnaire.created_at)}</strong></span>
                   {superAdminView && <span className="evaluation-card-owner"><small>Administrator</small><strong>{questionnaire.administrator_id || '—'}</strong></span>}
                 </div>
-                <button className="evaluation-card-open" onClick={() => navigate(detailPath(questionnaire.id))}>
-                  Kelola evaluasi <span aria-hidden="true">↗</span>
-                </button>
+                <div className="evaluation-card-actions">
+                  <button className="evaluation-card-open" onClick={() => navigate(detailPath(questionnaire.id))}>
+                    Kelola evaluasi <span aria-hidden="true">↗</span>
+                  </button>
+                  {superAdminView && (
+                    <button className="evaluation-card-open evaluation-card-results" onClick={() => navigate(`/admin/hasil/${questionnaire.id}`)}>
+                      Lihat Hasil <span aria-hidden="true">↗</span>
+                    </button>
+                  )}
+                </div>
               </article>
             ))}
           </div>

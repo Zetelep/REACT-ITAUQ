@@ -1099,6 +1099,21 @@
   transform: translate(2px, -2px);
 }
 
+.evaluation-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 15px;
+}
+
+.evaluation-card-results {
+  color: #64748b;
+}
+
+.evaluation-card-results:hover {
+  color: #0f766e;
+}
+
 .evaluation-board .table-empty {
   align-items: center;
   background: #f8fbfa;

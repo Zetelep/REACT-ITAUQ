@@ -17,26 +17,27 @@ import DashboardPage from '../dashboard/DashboardPage'
 import EvaluationPage from '../evaluations/EvaluationPage'
 import SettingsPage from '../settings/SettingsPage'
 import AllEvaluationsPage from '../evaluations/AllEvaluationsPage'
+import HasilPage from '../evaluations/HasilPage'
 import AccountRequestsPage from '../account-management/AccountRequestsPage'
 import AccountManagementPage from '../account-management/AccountManagementPage'
-import SusEvaluationPage from '../evaluations/SusEvaluationPage'
 import ChangePasswordPage from '../settings/ChangePasswordPage'
+import HasilSUSPage from '../evaluations/HasilSUSPage'
 
 import './AdminLayout.css'
 
 const pages = [
   { key: 'dashboard', label: 'Dashboard', path: '/admin/dashboard', icon: dashboardIcon },
   { key: 'evaluasi', label: 'Evaluasi', path: '/admin/evaluasi', icon: taskIcon },
+  { key: 'hasil', label: 'Hasil', path: '/admin/hasil', icon: sentimentIcon },
   { key: 'setting', label: 'Setting', path: '/admin/settings', icon: settingsIcon },
 ]
 
 // Only visible for accounts with the Super Admin role
 const superAdminPages = [
   { key: 'semua-evaluasi', label: 'Semua Evaluasi', path: '/admin/semua-evaluasi', icon: assignmentIcon },
+  { key: 'evaluasi-sus', label: 'Hasil SUS', path: '/admin/evaluasi-sus', icon: sentimentIcon },
   { key: 'pengajuan-akun', label: 'Pengajuan Akun', path: '/admin/pengajuan-akun', icon: approvalIcon },
   { key: 'manajemen-akun', label: 'Manajemen Akun', path: '/admin/manajemen-akun', icon: accountBoxIcon },
-  { key: 'evaluasi-sus', label: 'Evaluasi SUS', path: '/admin/evaluasi-sus', icon: sentimentIcon },
-
 ]
 
 export default function AdminLayout() {
@@ -49,9 +50,10 @@ export default function AdminLayout() {
 
   const activePage = useMemo(() => {
     if (location.pathname.startsWith('/admin/change-password')) return 'change-password'
-    if (location.pathname.startsWith('/admin/evaluasi-sus')) return 'evaluasi-sus'
     if (location.pathname.startsWith('/admin/semua-evaluasi')) return 'semua-evaluasi'
+    if (location.pathname.startsWith('/admin/evaluasi-sus')) return 'evaluasi-sus'
     if (location.pathname.startsWith('/admin/evaluasi')) return 'evaluasi'
+    if (location.pathname.startsWith('/admin/hasil')) return 'hasil'
     if (location.pathname.startsWith('/admin/pengajuan-akun')) return 'pengajuan-akun'
     if (location.pathname.startsWith('/admin/manajemen-akun')) return 'manajemen-akun'
     if (location.pathname.startsWith('/admin/settings')) return 'setting'
@@ -173,8 +175,9 @@ export default function AdminLayout() {
           <>
             {activePage === 'dashboard' && <DashboardPage />}
             {activePage === 'evaluasi' && <EvaluationPage />}
+            {activePage === 'hasil' && <HasilPage />}
             {activePage === 'semua-evaluasi' && <AllEvaluationsPage />}
-            {activePage === 'evaluasi-sus' && <SusEvaluationPage />}
+            {activePage === 'evaluasi-sus' && <HasilSUSPage />}
             {activePage === 'pengajuan-akun' && <AccountRequestsPage />}
             {activePage === 'manajemen-akun' && <AccountManagementPage />}
             {activePage === 'setting' && <SettingsPage />}
