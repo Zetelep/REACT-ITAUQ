@@ -617,13 +617,14 @@ List questionnaires with filtering and pagination.
 **Auth:** Administrator or Super Admin
 
 - **Administrator:** Automatically scoped to own questionnaires
-- **Super Admin:** Sees all; optional `administrator_id` filter
+- **Super Admin:** Sees all; optional `administrator_id` filter or case-insensitive partial `administrator_search` filter on the administrator's name
 
 **Query Parameters:**
 | Param | Type | Description |
 |-------|------|-------------|
 | `status` | string | Filter by: `draft`, `active`, `closed` |
 | `administrator_id` | uuid | Filter by administrator (Super Admin only) |
+| `administrator_search` | string | Search administrator name, e.g. `siti` (Super Admin only) |
 | `page` | int | Page number (default: 1) |
 | `page_size` | int | Items per page (default: 20) |
 

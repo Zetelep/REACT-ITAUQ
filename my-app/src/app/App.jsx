@@ -4,6 +4,7 @@ import './App.css'
 import AuthForm from '../features/auth/AuthForm'
 import AdminLayout from '../features/admin-layout/AdminLayout'
 import LandingPage from '../features/landing/LandingPage'
+import RespondentEligibilityPage from '../features/respondent/RespondentEligibilityPage'
 import { useAuth } from './providers/AuthProvider'
 
 function AppContent() {
@@ -14,10 +15,14 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/" element={session?.user ? <Navigate to="/admin/dashboard" replace /> : <LandingPage />} />
+      <Route path="/e/:token" element={<RespondentEligibilityPage />} />
+      <Route path="/evaluation/:token" element={<RespondentEligibilityPage />} />
       <Route path="/admin" element={session?.user ? <Navigate to="/admin/dashboard" replace /> : <AuthForm />} />
       <Route path="/admin/dashboard" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/evaluasi" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/evaluasi/:questionnaireId" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
+      <Route path="/admin/hasil" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
+      <Route path="/admin/hasil/:questionnaireId" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/semua-evaluasi" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/semua-evaluasi/:questionnaireId" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
       <Route path="/admin/evaluasi-sus" element={session?.user ? <AdminLayout /> : <Navigate to="/admin" replace />} />
