@@ -110,6 +110,9 @@ function ReportList() {
 
   const isSuperAdmin = profile?.role === 'super_admin'
 
+  // Only super_admin can see SUS Score
+  const showSusScore = isSuperAdmin
+
   useEffect(() => {
     let cancelled = false
     async function fetchData() {
@@ -211,7 +214,9 @@ function ReportList() {
                       <div className="hasil-card-score-details">
                         <span><small>Responden</small><strong>{report.respondent_count}</strong></span>
                         <span><small>Task Success</small><strong>{report.task_success_rate_avg != null ? `${report.task_success_rate_avg.toFixed(1)}%` : '—'}</strong></span>
-                        <span><small>SUS Score</small><strong>{report.evaluation_website_sus_score_avg != null ? report.evaluation_website_sus_score_avg.toFixed(1) : '—'}</strong></span>
+                        {showSusScore && (
+                          <span><small>SUS Score</small><strong>{report.evaluation_website_sus_score_avg != null ? report.evaluation_website_sus_score_avg.toFixed(1) : '—'}</strong></span>
+                        )}
                       </div>
                     </div>
                   ) : reportsLoading ? (
@@ -246,6 +251,7 @@ function ReportList() {
 
 function ReportDetail({ questionnaireId }) {
   const navigate = useNavigate()
+  const { profile } = useProfile()
   const [report, setReport] = useState(null)
   const [questionnaire, setQuestionnaire] = useState(null)
   const [tasks, setTasks] = useState([])
@@ -257,6 +263,9 @@ function ReportDetail({ questionnaireId }) {
   const [loading, setLoading] = useState(true)
   const [respLoading, setRespLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Only super_admin can see SUS Score
+  const showSusScore = profile?.role === 'super_admin'
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -452,7 +461,7 @@ function ReportDetail({ questionnaireId }) {
                   <th>Nama</th>
                   <th>Skor I-TAUQ</th>
                   <th>Task Success</th>
-                  <th>SUS Score</th>
+                  {showSusScore && <th>SUS Score</th>}
                   <th>Tanggal Submit</th>
                   <th></th>
                 </tr>
@@ -465,7 +474,9 @@ function ReportDetail({ questionnaireId }) {
                       <td><strong>{r.respondent_name}</strong></td>
                       <td>{rawScore != null ? `${formatScore(rawScore)}/7` : '—'}</td>
                       <td>{r.task_success_rate_pct != null ? `${r.task_success_rate_pct.toFixed(1)}%` : '—'}</td>
-                      <td>{r.evaluation_website_sus_score != null ? r.evaluation_website_sus_score.toFixed(1) : '—'}</td>
+                      {showSusScore && (
+                        <td>{r.evaluation_website_sus_score != null ? r.evaluation_website_sus_score.toFixed(1) : '—'}</td>
+                      )}
                       <td>{formatDate(r.submitted_at)}</td>
                       <td>
                         <button className="text-action" onClick={() => fetchRespondentDetail(r.respondent_id)}>
@@ -509,10 +520,14 @@ function ReportDetail({ questionnaireId }) {
 }
 
 function RespondentDetailModal({ respondent, onClose }) {
+  const { profile } = useProfile()
   const categoryScores = normalizeRespondentCategories(respondent.category_scores)
   const overallRaw = respondent.overall_usability_score != null
     ? normalizedToRaw(respondent.overall_usability_score)
     : computeOverallFromCategories(categoryScores)
+
+  // Only super_admin can see SUS Score
+  const showSusScore = profile?.role === 'super_admin'
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -581,7 +596,7 @@ function RespondentDetailModal({ respondent, onClose }) {
           </div>
         )}
 
-        {respondent.evaluation_website_sus && (
+        {showSusScore && respondent.evaluation_website_sus && (
           <div className="hasil-respondent-sus">
             <h3>Evaluation Website SUS</h3>
             <p>
