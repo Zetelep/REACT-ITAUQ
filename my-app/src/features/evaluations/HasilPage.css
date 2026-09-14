@@ -78,8 +78,8 @@
   border-radius: 17px;
   display: flex;
   flex-direction: column;
-  min-height: 238px;
-  padding: 17px;
+  min-height: 180px;
+  padding: 14px;
   transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
@@ -102,9 +102,8 @@
 }
 
 .hasil-card-body {
-  flex: 1;
   min-width: 0;
-  padding: 16px 0 12px;
+  padding: 10px 0 8px;
 }
 
 .hasil-card-app {
@@ -133,14 +132,20 @@
 .hasil-card-scores {
   border-top: 1px solid #e8f0ee;
   display: flex;
-  gap: 16px;
-  padding-top: 13px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  padding: 10px 0;
 }
 
 .hasil-card-score-main {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 3px;
+  text-align: center;
 }
 
 .hasil-card-score-label {
@@ -169,14 +174,14 @@
 .hasil-card-score-details {
   display: flex;
   gap: 14px;
-  margin-left: auto;
+  justify-content: center;
 }
 
 .hasil-card-score-details span {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  text-align: right;
+  text-align: center;
 }
 
 .hasil-card-score-details small {
@@ -317,9 +322,11 @@
   border-radius: 16px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 6px;
   padding: 18px 20px;
   position: relative;
+  text-align: center;
   z-index: 1;
 }
 
@@ -335,6 +342,7 @@
   align-items: baseline;
   display: flex;
   gap: 6px;
+  justify-content: center;
 }
 
 .hasil-score-number {
@@ -607,11 +615,33 @@
   margin: 0;
 }
 
-.hasil-respondent-table th {
-  font-size: 0.65rem;
+.data-table.hasil-respondent-table {
+  table-layout: auto;
 }
 
-.hasil-respondent-table td strong {
+.data-table.hasil-respondent-table th,
+.data-table.hasil-respondent-table td {
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table.hasil-respondent-table th {
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.data-table.hasil-respondent-table td {
+  white-space: nowrap;
+}
+
+.data-table.hasil-respondent-table th:last-child,
+.data-table.hasil-respondent-table td:last-child {
+  text-align: right;
+  width: 80px;
+}
+
+.data-table.hasil-respondent-table td strong {
   color: #1e293b;
   font-size: 0.82rem;
 }
@@ -853,12 +883,7 @@
   }
 
   .hasil-card-scores {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .hasil-card-score-details {
-    margin-left: 0;
+    gap: 6px;
   }
 
   .hasil-respondent-info {
@@ -892,6 +917,11 @@
   .hasil-metric-card {
     min-height: 85px;
     padding: 11px;
+  }
+
+  .hasil-card {
+    min-height: 160px;
+    padding: 12px;
   }
 
   .hasil-board {
