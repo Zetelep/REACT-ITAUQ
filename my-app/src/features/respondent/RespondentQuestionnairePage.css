@@ -307,16 +307,19 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-scale {
   display: grid;
-  grid-template-columns: 88px minmax(260px, 1fr) 88px;
+  grid-template-columns: minmax(min-content, 1.1fr) auto minmax(min-content, 1.1fr);
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   margin-top: 19px;
 }
 
 .questionnaire-scale-label {
-  color: #81958f;
-  font-size: 0.63rem;
-  line-height: 1.25;
+  color: #5a736c;
+  font-size: clamp(0.62rem, 1.2vw, 0.78rem);
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 
 .questionnaire-scale-label--max {
@@ -325,8 +328,8 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-scale-options {
   display: flex;
-  justify-content: space-between;
-  gap: 9px;
+  justify-content: center;
+  gap: 40px;
 }
 
 .questionnaire-scale-option {
@@ -382,6 +385,12 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-category--sus {
   margin-top: 40px;
+}
+
+.questionnaire-category--sus .questionnaire-scale-label {
+  color: #3d5c54;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .questionnaire-form-error {
@@ -557,16 +566,17 @@ body:has(.respondent-questionnaire-page) {
   }
 
   .questionnaire-scale {
-    grid-template-columns: 55px minmax(0, 1fr) 55px;
+    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
     gap: 7px;
   }
 
   .questionnaire-scale-options {
-    gap: 2px;
+    gap: 5px;
   }
 
   .questionnaire-scale-label {
-    font-size: 0.57rem;
+    font-size: clamp(0.55rem, 2.5vw, 0.68rem);
+    font-weight: 600;
   }
 
   .questionnaire-radio {
@@ -599,10 +609,11 @@ body:has(.respondent-questionnaire-page) {
   }
 
   .questionnaire-scale {
-    grid-template-columns: 45px minmax(0, 1fr) 45px;
+    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
   }
 
   .questionnaire-scale-label {
-    font-size: 0.52rem;
+    font-size: clamp(0.5rem, 3vw, 0.6rem);
+    font-weight: 600;
   }
 }

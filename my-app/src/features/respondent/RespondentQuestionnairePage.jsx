@@ -84,8 +84,9 @@ function QuestionScale({ question, scale, value, onChange, minLabel, maxLabel, n
 }
 
 function CategorySection({ category, questions, answers, scale, onChange, startNumber, namePrefix = 'itauq', defaultMinLabel = 'Tidak sesuai', defaultMaxLabel = 'Sangat sesuai' }) {
+  const sectionClass = namePrefix === 'sus' ? 'questionnaire-category questionnaire-category--sus' : 'questionnaire-category'
   return (
-    <section className="questionnaire-category" aria-labelledby={`category-${namePrefix}-${category}`}>
+    <section className={sectionClass} aria-labelledby={`category-${namePrefix}-${category}`}>
       <h2 id={`category-${namePrefix}-${category}`} className="questionnaire-category-title">{category}</h2>
       <div className="questionnaire-question-list">
         {questions.map((question, index) => (
