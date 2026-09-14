@@ -5,7 +5,7 @@ import './RespondentTaskScenarioPage.css'
 
 function getStoredTaskProgress(token) {
   try {
-    const stored = window.sessionStorage.getItem(`itauq:respondent:${token}:taskProgress`)
+    const stored = window.localStorage.getItem(`itauq:respondent:${token}:taskProgress`)
     return stored ? JSON.parse(stored) : null
   } catch {
     return null
@@ -14,7 +14,7 @@ function getStoredTaskProgress(token) {
 
 function storeTaskProgress(token, currentIndex) {
   try {
-    window.sessionStorage.setItem(`itauq:respondent:${token}:taskProgress`, JSON.stringify({ currentIndex }))
+    window.localStorage.setItem(`itauq:respondent:${token}:taskProgress`, JSON.stringify({ currentIndex }))
   } catch {
     // Enhancement only
   }

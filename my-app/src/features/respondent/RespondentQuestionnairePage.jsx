@@ -7,7 +7,7 @@ const EMPTY_QUESTIONS = []
 
 function getStoredQuestionnaireState(token) {
   try {
-    const stored = window.sessionStorage.getItem(`itauq:respondent:${token}:questionnaire`)
+    const stored = window.localStorage.getItem(`itauq:respondent:${token}:questionnaire`)
     return stored ? JSON.parse(stored) : null
   } catch {
     return null
@@ -16,7 +16,7 @@ function getStoredQuestionnaireState(token) {
 
 function storeQuestionnaireState(token, state) {
   try {
-    window.sessionStorage.setItem(`itauq:respondent:${token}:questionnaire`, JSON.stringify(state))
+    window.localStorage.setItem(`itauq:respondent:${token}:questionnaire`, JSON.stringify(state))
   } catch {
     // Enhancement only
   }
@@ -205,10 +205,10 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
       if (result) {
         setSubmittedAt(result)
         try {
-          window.sessionStorage.removeItem(`itauq:respondent:${token}:session`)
-          window.sessionStorage.removeItem(`itauq:respondent:${token}:flowStep`)
-          window.sessionStorage.removeItem(`itauq:respondent:${token}:taskProgress`)
-          window.sessionStorage.removeItem(`itauq:respondent:${token}:questionnaire`)
+          window.localStorage.removeItem(`itauq:respondent:${token}:session`)
+          window.localStorage.removeItem(`itauq:respondent:${token}:flowStep`)
+          window.localStorage.removeItem(`itauq:respondent:${token}:taskProgress`)
+          window.localStorage.removeItem(`itauq:respondent:${token}:questionnaire`)
         } catch {
           // cleanup best-effort
         }

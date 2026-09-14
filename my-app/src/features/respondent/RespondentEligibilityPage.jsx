@@ -16,7 +16,7 @@ const EMPTY_PROFILE = {
 
 function getStoredCriteria(token) {
   try {
-    const stored = window.sessionStorage.getItem(`itauq:respondent:${token}:eligibility`)
+    const stored = window.localStorage.getItem(`itauq:respondent:${token}:eligibility`)
     const parsed = stored ? JSON.parse(stored) : []
     return Array.isArray(parsed) ? parsed : []
   } catch {
@@ -26,7 +26,7 @@ function getStoredCriteria(token) {
 
 function storeCriteria(token, criteriaIds) {
   try {
-    window.sessionStorage.setItem(
+    window.localStorage.setItem(
       `itauq:respondent:${token}:eligibility`,
       JSON.stringify(criteriaIds),
     )
@@ -37,7 +37,7 @@ function storeCriteria(token, criteriaIds) {
 
 function storeRespondent(token, respondent) {
   try {
-    window.sessionStorage.setItem(`itauq:respondent:${token}:session`, JSON.stringify(respondent))
+    window.localStorage.setItem(`itauq:respondent:${token}:session`, JSON.stringify(respondent))
   } catch {
     // The API response is still available in component state when storage is unavailable.
   }
@@ -45,7 +45,7 @@ function storeRespondent(token, respondent) {
 
 function getStoredRespondent(token) {
   try {
-    const stored = window.sessionStorage.getItem(`itauq:respondent:${token}:session`)
+    const stored = window.localStorage.getItem(`itauq:respondent:${token}:session`)
     return stored ? JSON.parse(stored) : null
   } catch {
     return null
@@ -54,7 +54,7 @@ function getStoredRespondent(token) {
 
 function getStoredFlowStep(token) {
   try {
-    return window.sessionStorage.getItem(`itauq:respondent:${token}:flowStep`) || ''
+    return window.localStorage.getItem(`itauq:respondent:${token}:flowStep`) || ''
   } catch {
     return ''
   }
@@ -62,7 +62,7 @@ function getStoredFlowStep(token) {
 
 function storeFlowStep(token, step) {
   try {
-    window.sessionStorage.setItem(`itauq:respondent:${token}:flowStep`, step)
+    window.localStorage.setItem(`itauq:respondent:${token}:flowStep`, step)
   } catch {
     // Enhancement only
   }
