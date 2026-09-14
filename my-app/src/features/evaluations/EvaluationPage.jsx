@@ -205,7 +205,7 @@ function QuestionnaireList({ superAdminView }) {
           <span className="evaluation-stat-label">Terlihat</span>
           <strong>{questionnaires.length}</strong>
           <small>evaluasi di halaman ini</small>
-          <span className="evaluation-stat-mark" aria-hidden="true">01</span>
+          <span className="evaluation-stat-mark" aria-hidden="true"></span>
         </article>
         <article className="evaluation-stat-card">
           <span className="evaluation-stat-label">Aktif</span>
