@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
+import { uploadQuestionnaireImage } from '../../shared/clients/imageUpload'
 import '../account-management/AccountRequestsPage.css'
 import './QuestionnairePage.css'
 import EvaluationLinksSection from './EvaluationLinksSection'
@@ -19,6 +20,8 @@ const emptyQuestionnaire = {
   description: '',
   status: 'draft',
   itauq_version: 'itauq-v1',
+  app_link: '',
+  img_link: '',
 }
 
 function formatDate(value) {
@@ -712,25 +715,64 @@ function ResourceCard({ number, title, description, children, draggable = false,
 function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
   const [form, setForm] = useState(() => ({ ...emptyQuestionnaire, ...questionnaire }))
   const [error, setError] = useState('')
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(form.img_link || '')
+  const [uploading, setUploading] = useState(false)
   const editing = Boolean(questionnaire)
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('Hanya file gambar yang diperbolehkan.')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Ukuran file maksimal 10 MB sebelum kompresi.')
+      return
+    }
+    setError('')
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    setImagePreview('')
+    update('img_link', '')
+  }
+
   const submit = async (event) => {
     event.preventDefault()
     if (!form.title.trim() || !form.app_name.trim()) {
       setError('Judul dan nama aplikasi wajib diisi.')
       return
     }
+    if (form.app_link.trim() && !/^https?:\/\/.+/.test(form.app_link.trim())) {
+      setError('Link aplikasi harus diawali http:// atau https://')
+      return
+    }
     setError('')
     try {
+      let imgUrl = form.img_link || ''
+      if (imageFile) {
+        setUploading(true)
+        imgUrl = await uploadQuestionnaireImage(imageFile)
+        setUploading(false)
+      }
       await onSubmit({
         title: form.title.trim(),
         app_name: form.app_name.trim(),
         description: form.description.trim(),
         status: form.status,
+        app_link: form.app_link.trim() || '',
+        img_link: imgUrl,
         ...(editing ? {} : { itauq_version: form.itauq_version.trim() || 'itauq-v1' }),
       })
     } catch (err) {
+      setUploading(false)
       setError(err.message || 'Gagal menyimpan evaluasi.')
     }
   }
@@ -746,7 +788,28 @@ function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
           <div className="modal-field"><label htmlFor="questionnaire-status">Status</label><select id="questionnaire-status" className="modal-input" value={form.status} onChange={(event) => update('status', event.target.value)}>{STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
           {!editing && <div className="modal-field"><label htmlFor="questionnaire-version">Versi ITAUQ</label><input id="questionnaire-version" className="modal-input" value={form.itauq_version} onChange={(event) => update('itauq_version', event.target.value)} /></div>}
         </div>
-        <ModalActions onClose={onClose} submitting={submitting} submitLabel={editing ? 'Simpan Perubahan' : 'Buat Evaluasi'} />
+        <div className="modal-field">
+          <label htmlFor="questionnaire-app-link">Link Aplikasi <span>(opsional)</span></label>
+          <input id="questionnaire-app-link" className="modal-input" type="url" placeholder="https://contoh.com" value={form.app_link} onChange={(event) => update('app_link', event.target.value)} />
+          <span className="modal-help">Tautan ke aplikasi yang akan dievaluasi responden.</span>
+        </div>
+        <div className="modal-field">
+          <label>Gambar Aplikasi <span>(opsional)</span></label>
+          {imagePreview ? (
+            <div className="modal-image-preview">
+              <img src={imagePreview} alt="Pratinjau gambar aplikasi" />
+              <button type="button" className="modal-image-remove" onClick={removeImage} title="Hapus gambar">×</button>
+            </div>
+          ) : (
+            <label htmlFor="questionnaire-image" className="modal-image-upload">
+              <span className="modal-image-upload-icon" aria-hidden="true">+</span>
+              <span>Pilih gambar</span>
+              <small>JPG, PNG, WEBP — dikompres otomatis di bawah 500 KB</small>
+            </label>
+          )}
+          <input id="questionnaire-image" type="file" accept="image/*" onChange={handleFileChange} className="modal-image-input" />
+        </div>
+        <ModalActions onClose={onClose} submitting={submitting || uploading} submitLabel={uploading ? 'Mengunggah gambar...' : editing ? 'Simpan Perubahan' : 'Buat Evaluasi'} />
       </form>
     </Modal>
   )

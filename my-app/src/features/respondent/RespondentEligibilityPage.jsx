@@ -89,7 +89,15 @@ function sortCriteria(criteria) {
   })
 }
 
-function AppPreview({ appName }) {
+function AppPreview({ appName, imgLink }) {
+  if (imgLink) {
+    return (
+      <div className="respondent-app-preview" aria-label={`Pratinjau aplikasi ${appName}`}>
+        <img className="respondent-app-preview-img" src={imgLink} alt={`Pratinjau ${appName}`} />
+      </div>
+    )
+  }
+
   return (
     <div className="respondent-app-preview" aria-label={`Pratinjau aplikasi ${appName}`}>
       <div className="respondent-preview-window respondent-preview-window--back" />
@@ -350,6 +358,7 @@ export default function RespondentEligibilityPage() {
 
   const questionnaire = evaluation?.questionnaire || {}
   const appName = questionnaire.app_name || 'Aplikasi yang akan dievaluasi'
+  const appLink = questionnaire.app_link || ''
   const taskScenarios = evaluation?.task_scenarios || []
   const isProfileStep = flowStep === 'profile'
 
@@ -448,6 +457,7 @@ export default function RespondentEligibilityPage() {
       <RespondentTaskScenarioPage
         tasks={taskScenarios}
         appName={appName}
+        appLink={appLink}
         token={token}
         respondentId={submittedRespondent.respondent_id}
         onFinished={() => setFlowStep('questionnaire')}
@@ -507,7 +517,7 @@ export default function RespondentEligibilityPage() {
               <span className="respondent-card-kicker">Objek evaluasi</span>
               <h2 id="app-heading">Sekilas Aplikasi yang akan Anda evaluasi</h2>
             </div>
-            <AppPreview appName={appName} />
+            <AppPreview appName={appName} imgLink={questionnaire.img_link} />
             <p className="respondent-app-name">{appName}</p>
             <p className="respondent-app-caption">Bantu kami membuat pengalaman digital pariwisata yang lebih baik.</p>
           </section>

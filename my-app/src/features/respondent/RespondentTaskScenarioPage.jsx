@@ -47,7 +47,8 @@ function getErrorMessage(error) {
   return error?.message || 'Hasil tugas belum dapat disimpan. Silakan coba lagi.'
 }
 
-function getWebsiteUrl(appName) {
+function getWebsiteUrl(appName, appLink) {
+  if (appLink && /^https?:\/\//i.test(appLink)) return appLink
   if (!appName) return ''
   if (/^https?:\/\//i.test(appName)) return appName
   if (/^[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(appName)) return `https://${appName}`
@@ -55,7 +56,7 @@ function getWebsiteUrl(appName) {
 }
 
 
-export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName, token, respondentId, onFinished }) {
+export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName, appLink, token, respondentId, onFinished }) {
   const tasks = useMemo(() => sortTasks(sourceTasks || []), [sourceTasks])
   const [currentIndex, setCurrentIndex] = useState(() => {
     const stored = getStoredTaskProgress(token)
@@ -69,8 +70,9 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   const [lastResult, setLastResult] = useState(null)
   const [error, setError] = useState('')
   const [websiteNotice, setWebsiteNotice] = useState('')
+  const [copied, setCopied] = useState(false)
   const currentTask = tasks[currentIndex]
-  const websiteUrl = getWebsiteUrl(appName)
+  const websiteUrl = getWebsiteUrl(appName, appLink)
   const completedCount = currentIndex
 
   useEffect(() => {
@@ -104,12 +106,33 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
     storeTaskProgress(token, currentIndex)
   }, [token, currentIndex])
 
+  const handleCopyInstruction = async () => {
+    const instructionText = `${currentTask.title || `Skenario tugas ${currentIndex + 1}`}\n\n${currentTask.instruction || 'Ikuti instruksi dari peneliti untuk menyelesaikan tugas ini.'}`
+    try {
+      await navigator.clipboard.writeText(instructionText)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = instructionText
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   if (!currentTask) return null
 
   const handleOpenWebsite = () => {
     if (websiteUrl) {
-      window.open(websiteUrl, '_blank', 'noopener,noreferrer')
-      setWebsiteNotice('Website dibuka di tab baru. Kembali ke halaman ini setelah selesai.')
+      window.open(websiteUrl, '_blank', 'width=1024,height=768,noopener,noreferrer')
+      setWebsiteNotice('Website dibuka di jendela baru. Kembali ke halaman ini setelah selesai.')
       return
     }
 
@@ -176,6 +199,14 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
           <div className="task-instruction-card">
             <strong>{currentTask.title || `Skenario tugas ${currentIndex + 1}`}</strong>
             <p>{currentTask.instruction || 'Ikuti instruksi dari peneliti untuk menyelesaikan tugas ini.'}</p>
+            <button
+              className="task-copy-button"
+              type="button"
+              onClick={handleCopyInstruction}
+              disabled={!isStarted}
+            >
+              {copied ? '✓ Tersalin' : '📋 Salin Instruksi'}
+            </button>
           </div>
 
           <div className="task-elapsed-block">
