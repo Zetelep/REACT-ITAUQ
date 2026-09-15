@@ -70,6 +70,7 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   const [lastResult, setLastResult] = useState(null)
   const [error, setError] = useState('')
   const [websiteNotice, setWebsiteNotice] = useState('')
+  const [copied, setCopied] = useState(false)
   const currentTask = tasks[currentIndex]
   const websiteUrl = getWebsiteUrl(appName, appLink)
   const completedCount = currentIndex
@@ -104,6 +105,27 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   useEffect(() => {
     storeTaskProgress(token, currentIndex)
   }, [token, currentIndex])
+
+  const handleCopyInstruction = async () => {
+    const instructionText = `${currentTask.title || `Skenario tugas ${currentIndex + 1}`}\n\n${currentTask.instruction || 'Ikuti instruksi dari peneliti untuk menyelesaikan tugas ini.'}`
+    try {
+      await navigator.clipboard.writeText(instructionText)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = instructionText
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   if (!currentTask) return null
 
@@ -177,6 +199,14 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
           <div className="task-instruction-card">
             <strong>{currentTask.title || `Skenario tugas ${currentIndex + 1}`}</strong>
             <p>{currentTask.instruction || 'Ikuti instruksi dari peneliti untuk menyelesaikan tugas ini.'}</p>
+            <button
+              className="task-copy-button"
+              type="button"
+              onClick={handleCopyInstruction}
+              disabled={!isStarted}
+            >
+              {copied ? '✓ Tersalin' : '📋 Salin Instruksi'}
+            </button>
           </div>
 
           <div className="task-elapsed-block">
