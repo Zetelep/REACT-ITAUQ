@@ -358,6 +358,7 @@ export default function RespondentEligibilityPage() {
 
   const questionnaire = evaluation?.questionnaire || {}
   const appName = questionnaire.app_name || 'Aplikasi yang akan dievaluasi'
+  const appLink = questionnaire.app_link || ''
   const taskScenarios = evaluation?.task_scenarios || []
   const isProfileStep = flowStep === 'profile'
 
@@ -456,6 +457,7 @@ export default function RespondentEligibilityPage() {
       <RespondentTaskScenarioPage
         tasks={taskScenarios}
         appName={appName}
+        appLink={appLink}
         token={token}
         respondentId={submittedRespondent.respondent_id}
         onFinished={() => setFlowStep('questionnaire')}

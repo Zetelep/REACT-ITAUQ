@@ -47,7 +47,8 @@ function getErrorMessage(error) {
   return error?.message || 'Hasil tugas belum dapat disimpan. Silakan coba lagi.'
 }
 
-function getWebsiteUrl(appName) {
+function getWebsiteUrl(appName, appLink) {
+  if (appLink && /^https?:\/\//i.test(appLink)) return appLink
   if (!appName) return ''
   if (/^https?:\/\//i.test(appName)) return appName
   if (/^[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(appName)) return `https://${appName}`
@@ -55,7 +56,7 @@ function getWebsiteUrl(appName) {
 }
 
 
-export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName, token, respondentId, onFinished }) {
+export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName, appLink, token, respondentId, onFinished }) {
   const tasks = useMemo(() => sortTasks(sourceTasks || []), [sourceTasks])
   const [currentIndex, setCurrentIndex] = useState(() => {
     const stored = getStoredTaskProgress(token)
@@ -70,7 +71,7 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   const [error, setError] = useState('')
   const [websiteNotice, setWebsiteNotice] = useState('')
   const currentTask = tasks[currentIndex]
-  const websiteUrl = getWebsiteUrl(appName)
+  const websiteUrl = getWebsiteUrl(appName, appLink)
   const completedCount = currentIndex
 
   useEffect(() => {
@@ -108,8 +109,8 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
 
   const handleOpenWebsite = () => {
     if (websiteUrl) {
-      window.open(websiteUrl, '_blank', 'noopener,noreferrer')
-      setWebsiteNotice('Website dibuka di tab baru. Kembali ke halaman ini setelah selesai.')
+      window.open(websiteUrl, '_blank', 'width=1024,height=768,noopener,noreferrer')
+      setWebsiteNotice('Website dibuka di jendela baru. Kembali ke halaman ini setelah selesai.')
       return
     }
 
