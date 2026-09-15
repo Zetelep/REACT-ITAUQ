@@ -231,8 +231,8 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
     : String(evaluation?.sus?.version || 'SUS').toUpperCase()
   const title = isItauqStep ? 'Kuesioner ITAUQ' : 'Kuesioner SUS'
   const description = isItauqStep
-    ? 'Indonesian Tourism Application Usability Questionnaire (ITAUQ). Silakan isi survei di bawah ini untuk membantu mengevaluasi kondisi pengalaman pengguna saat ini dari produk digital tersebut.'
-    : 'System Usability Scale (SUS). Nilai pengalaman Anda saat mengisi website evaluasi ini berdasarkan pernyataan berikut.'
+    ? `<b>Indonesian Tourism Application Usability Questionnaire (ITAUQ)</b>. Silakan isi survei di bawah ini untuk <b>membantu mengevaluasi kondisi pengalaman pengguna saat ini dari produk digital ${appName}</b>.`
+    : '<b>System Usability Scale (SUS)</b>. Nilai pengalaman Anda saat <b>mengisi website evaluasi ini</b> berdasarkan pernyataan berikut.'
 
   return (
     <main className="respondent-questionnaire-page">
@@ -258,7 +258,7 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
           <div className="questionnaire-intro-copy">
             <span className="questionnaire-eyebrow">PROTOKOL: {protocol}</span>
             <h1>{title}</h1>
-            <p>{description}</p>
+            <p dangerouslySetInnerHTML={{ __html: description }} />
           </div>
           <div className="questionnaire-hero-visual" aria-hidden="true">
             <span>{isItauqStep ? <>UX<br />STUDY</> : <>SUS<br />STUDY</>}</span>

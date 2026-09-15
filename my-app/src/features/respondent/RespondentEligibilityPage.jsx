@@ -254,7 +254,7 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
         </div>
 
         <div className="respondent-field respondent-field--full">
-          <label htmlFor="respondent-email">Email <small>(opsional)</small></label>
+          <label htmlFor="respondent-email">Email</label>
           <input
             id="respondent-email"
             name="email"

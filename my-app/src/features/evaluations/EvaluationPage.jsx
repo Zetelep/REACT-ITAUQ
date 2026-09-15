@@ -789,7 +789,7 @@ function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
           {!editing && <div className="modal-field"><label htmlFor="questionnaire-version">Versi ITAUQ</label><input id="questionnaire-version" className="modal-input" value={form.itauq_version} onChange={(event) => update('itauq_version', event.target.value)} /></div>}
         </div>
         <div className="modal-field">
-          <label htmlFor="questionnaire-app-link">Link Aplikasi <span>(opsional)</span></label>
+          <label htmlFor="questionnaire-app-link">Link Aplikasi</label>
           <input id="questionnaire-app-link" className="modal-input" type="url" placeholder="https://contoh.com" value={form.app_link} onChange={(event) => update('app_link', event.target.value)} />
           <span className="modal-help">Tautan ke aplikasi yang akan dievaluasi responden.</span>
         </div>
