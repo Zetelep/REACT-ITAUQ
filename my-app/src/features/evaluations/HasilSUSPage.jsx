@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../../shared/api/apiClient'
 import './HasilSUSPage.css'
 
@@ -8,6 +8,8 @@ const SUS_RANGES = [
   { label: 'Marginal', min: 50, max: 67, color: '#b45309', bg: '#fef3c7' },
   { label: 'Poor', min: 0, max: 49, color: '#dc2626', bg: '#fee2e2' },
 ]
+
+const PAGE_SIZE = 10
 
 function classifySUS(score) {
   if (score == null) return null
@@ -30,7 +32,7 @@ function formatDate(value) {
   })
 }
 
-async function fetchAllRespondents() {
+async function fetchAllSUSScores() {
   const all = []
   let page = 1
   let totalPages = 1
@@ -41,7 +43,11 @@ async function fetchAllRespondents() {
       includeMeta: true,
     })
     const items = Array.isArray(result?.data) ? result.data : []
-    all.push(...items)
+    for (const r of items) {
+      if (r.evaluation_website_sus_score != null) {
+        all.push(r.evaluation_website_sus_score)
+      }
+    }
     totalPages = result?.meta?.total_pages || 1
     page++
   }
@@ -49,11 +55,45 @@ async function fetchAllRespondents() {
   return all
 }
 
+function computeStats(scores) {
+  if (scores.length === 0) {
+    return { count: 0, avg: null, median: null, min: null, max: null, stdDev: null, distribution: {} }
+  }
+
+  const count = scores.length
+  const avg = scores.reduce((sum, s) => sum + s, 0) / count
+  const sorted = [...scores].sort((a, b) => a - b)
+  const median = count % 2 === 0
+    ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
+    : sorted[Math.floor(count / 2)]
+  const min = sorted[0]
+  const max = sorted[sorted.length - 1]
+  const variance = scores.reduce((sum, s) => sum + (s - avg) ** 2, 0) / count
+  const stdDev = Math.sqrt(variance)
+
+  const distribution = {}
+  SUS_RANGES.forEach((r) => { distribution[r.label] = 0 })
+  scores.forEach((s) => {
+    const cls = classifySUS(s)
+    if (cls) distribution[cls]++
+  })
+
+  return { count, avg, median, min, max, stdDev, distribution }
+}
+
 export default function HasilSUSPage() {
-  const [respondents, setRespondents] = useState([])
+  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const [respondents, setRespondents] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalRespondents, setTotalRespondents] = useState(0)
+  const [tableLoading, setTableLoading] = useState(false)
   const [sortBy, setSortBy] = useState('score-desc')
+
+  const initialFetchDone = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -61,8 +101,9 @@ export default function HasilSUSPage() {
       setLoading(true)
       setError('')
       try {
-        const data = await fetchAllRespondents()
-        if (!cancelled) setRespondents(data)
+        const scores = await fetchAllSUSScores()
+        if (cancelled) return
+        setStats(computeStats(scores))
       } catch (err) {
         if (!cancelled) setError(err.message || 'Gagal memuat data responden.')
       } finally {
@@ -73,40 +114,35 @@ export default function HasilSUSPage() {
     return () => { cancelled = true }
   }, [])
 
-  const respondentsWithSUS = useMemo(
-    () => respondents.filter((r) => r.evaluation_website_sus_score != null),
-    [respondents]
-  )
-
-  const stats = useMemo(() => {
-    const scores = respondentsWithSUS.map((r) => r.evaluation_website_sus_score)
-    if (scores.length === 0) {
-      return { count: 0, avg: null, median: null, min: null, max: null, stdDev: null, distribution: {} }
+  const fetchPage = useCallback(async (p, sort) => {
+    setTableLoading(true)
+    try {
+      const result = await api.get('/respondents', {
+        params: { page: p, page_size: PAGE_SIZE },
+        includeMeta: true,
+      })
+      let items = Array.isArray(result?.data) ? result.data : []
+      items = items.filter((r) => r.evaluation_website_sus_score != null)
+      setRespondents(items)
+      setTotalPages(result?.meta?.total_pages || 1)
+      setTotalRespondents(result?.meta?.total || 0)
+    } catch {
+      // keep existing data on error
+    } finally {
+      setTableLoading(false)
     }
+  }, [])
 
-    const count = scores.length
-    const avg = scores.reduce((sum, s) => sum + s, 0) / count
-    const sorted = [...scores].sort((a, b) => a - b)
-    const median = count % 2 === 0
-      ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
-      : sorted[Math.floor(count / 2)]
-    const min = sorted[0]
-    const max = sorted[sorted.length - 1]
-    const variance = scores.reduce((sum, s) => sum + (s - avg) ** 2, 0) / count
-    const stdDev = Math.sqrt(variance)
-
-    const distribution = {}
-    SUS_RANGES.forEach((r) => { distribution[r.label] = 0 })
-    scores.forEach((s) => {
-      const cls = classifySUS(s)
-      if (cls) distribution[cls]++
-    })
-
-    return { count, avg, median, min, max, stdDev, distribution }
-  }, [respondentsWithSUS])
+  useEffect(() => {
+    if (loading) return
+    if (!initialFetchDone.current) {
+      initialFetchDone.current = true
+    }
+    fetchPage(page, sortBy)
+  }, [loading, page, sortBy, fetchPage])
 
   const sortedRespondents = useMemo(() => {
-    const copy = [...respondentsWithSUS]
+    const copy = [...respondents]
     switch (sortBy) {
       case 'score-asc': return copy.sort((a, b) => a.evaluation_website_sus_score - b.evaluation_website_sus_score)
       case 'name': return copy.sort((a, b) => (a.respondent_name || '').localeCompare(b.respondent_name || ''))
@@ -114,9 +150,21 @@ export default function HasilSUSPage() {
       case 'score-desc':
       default: return copy.sort((a, b) => b.evaluation_website_sus_score - a.evaluation_website_sus_score)
     }
-  }, [respondentsWithSUS, sortBy])
+  }, [respondents, sortBy])
 
-  const maxDistCount = Math.max(...Object.values(stats.distribution), 1)
+  const maxDistCount = stats ? Math.max(...Object.values(stats.distribution), 1) : 1
+
+  const pageNumbers = useMemo(() => {
+    const pages = []
+    const maxVisible = 5
+    let start = Math.max(1, page - Math.floor(maxVisible / 2))
+    let end = Math.min(totalPages, start + maxVisible - 1)
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1)
+    }
+    for (let i = start; i <= end; i++) pages.push(i)
+    return pages
+  }, [page, totalPages])
 
   return (
     <div className="page-container sus-page">
@@ -132,7 +180,7 @@ export default function HasilSUSPage() {
 
       {loading ? (
         <div className="table-loading">Memuat data SUS...</div>
-      ) : stats.count === 0 ? (
+      ) : !stats || stats.count === 0 ? (
         <div className="sus-empty">
           <span className="empty-state-icon" aria-hidden="true">📊</span>
           <strong>Belum ada data SUS.</strong>
@@ -248,7 +296,11 @@ export default function HasilSUSPage() {
               </div>
               <div className="sus-sort-control">
                 <label htmlFor="sus-sort">Urutkan</label>
-                <select id="sus-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <select
+                  id="sus-sort"
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
+                >
                   <option value="score-desc">Skor Tertinggi</option>
                   <option value="score-asc">Skor Terendah</option>
                   <option value="name">Nama A–Z</option>
@@ -271,38 +323,90 @@ export default function HasilSUSPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedRespondents.map((r, i) => {
-                    const cls = classifySUS(r.evaluation_website_sus_score)
-                    const meta = getRangeMeta(cls)
-                    return (
-                      <tr key={r.respondent_id}>
-                        <td className="sus-td-index">{i + 1}</td>
-                        <td><strong>{r.respondent_name}</strong></td>
-                        <td className="sus-td-questionnaire">
-                          <span>{r.questionnaire_title || '—'}</span>
-                          {r.app_name && <small>{r.app_name}</small>}
-                        </td>
-                        <td className="sus-td-admin">{r.administrator_name || '—'}</td>
-                        <td>
-                          <strong className="sus-td-score">{r.evaluation_website_sus_score.toFixed(1)}</strong>
-                        </td>
-                        <td>
-                          {meta && (
-                            <span
-                              className="sus-rating-badge"
-                              style={{ background: meta.bg, color: meta.color }}
-                            >
-                              {cls}
-                            </span>
-                          )}
-                        </td>
-                        <td className="sus-td-date">{formatDate(r.submitted_at)}</td>
-                      </tr>
-                    )
-                  })}
+                  {tableLoading ? (
+                    <tr><td colSpan={7} className="table-loading">Memuat...</td></tr>
+                  ) : sortedRespondents.length === 0 ? (
+                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem' }}>Tidak ada data</td></tr>
+                  ) : (
+                    sortedRespondents.map((r, i) => {
+                      const cls = classifySUS(r.evaluation_website_sus_score)
+                      const meta = getRangeMeta(cls)
+                      const globalIndex = (page - 1) * PAGE_SIZE + i + 1
+                      return (
+                        <tr key={r.respondent_id}>
+                          <td className="sus-td-index">{globalIndex}</td>
+                          <td><strong>{r.respondent_name}</strong></td>
+                          <td className="sus-td-questionnaire">
+                            <span>{r.questionnaire_title || '—'}</span>
+                            {r.app_name && <small>{r.app_name}</small>}
+                          </td>
+                          <td className="sus-td-admin">{r.administrator_name || '—'}</td>
+                          <td>
+                            <strong className="sus-td-score">{r.evaluation_website_sus_score.toFixed(1)}</strong>
+                          </td>
+                          <td>
+                            {meta && (
+                              <span
+                                className="sus-rating-badge"
+                                style={{ background: meta.bg, color: meta.color }}
+                              >
+                                {cls}
+                              </span>
+                            )}
+                          </td>
+                          <td className="sus-td-date">{formatDate(r.submitted_at)}</td>
+                        </tr>
+                      )
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {totalPages > 1 && (
+              <div className="table-pagination">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage(1)}
+                  disabled={page <= 1}
+                >
+                  «
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  ‹
+                </button>
+                {pageNumbers[0] > 1 && <span className="pagination-ellipsis">...</span>}
+                {pageNumbers.map((p) => (
+                  <button
+                    key={p}
+                    className={`pagination-btn ${p === page ? 'pagination-active' : ''}`}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+                {pageNumbers[pageNumbers.length - 1] < totalPages && <span className="pagination-ellipsis">...</span>}
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                >
+                  ›
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage(totalPages)}
+                  disabled={page >= totalPages}
+                >
+                  »
+                </button>
+                <span className="pagination-info">Halaman {page} dari {totalPages}</span>
+              </div>
+            )}
           </section>
         </>
       )}
