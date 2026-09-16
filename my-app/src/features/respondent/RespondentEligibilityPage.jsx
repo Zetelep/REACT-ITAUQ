@@ -12,7 +12,45 @@ const EMPTY_PROFILE = {
   age: '',
   gender: '',
   occupation: '',
+  province: '',
 }
+
+const PROVINCES = [
+  { code: '11', name: 'Aceh' },
+  { code: '12', name: 'Sumatera Utara' },
+  { code: '13', name: 'Sumatera Barat' },
+  { code: '14', name: 'Riau' },
+  { code: '15', name: 'Jambi' },
+  { code: '16', name: 'Sumatera Selatan' },
+  { code: '17', name: 'Bengkulu' },
+  { code: '18', name: 'Lampung' },
+  { code: '19', name: 'Kepulauan Bangka Belitung' },
+  { code: '21', name: 'Kepulauan Riau' },
+  { code: '31', name: 'DKI Jakarta' },
+  { code: '32', name: 'Jawa Barat' },
+  { code: '33', name: 'Jawa Tengah' },
+  { code: '34', name: 'DI Yogyakarta' },
+  { code: '35', name: 'Jawa Timur' },
+  { code: '36', name: 'Banten' },
+  { code: '51', name: 'Bali' },
+  { code: '52', name: 'Nusa Tenggara Barat' },
+  { code: '53', name: 'Nusa Tenggara Timur' },
+  { code: '61', name: 'Kalimantan Barat' },
+  { code: '62', name: 'Kalimantan Tengah' },
+  { code: '63', name: 'Kalimantan Selatan' },
+  { code: '64', name: 'Kalimantan Timur' },
+  { code: '65', name: 'Kalimantan Utara' },
+  { code: '71', name: 'Sulawesi Utara' },
+  { code: '72', name: 'Sulawesi Tengah' },
+  { code: '73', name: 'Sulawesi Selatan' },
+  { code: '74', name: 'Sulawesi Tenggara' },
+  { code: '75', name: 'Gorontalo' },
+  { code: '76', name: 'Sulawesi Barat' },
+  { code: '81', name: 'Maluku' },
+  { code: '82', name: 'Maluku Utara' },
+  { code: '91', name: 'Papua Barat' },
+  { code: '92', name: 'Papua' },
+]
 
 function getStoredCriteria(token) {
   try {
@@ -212,7 +250,7 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
         </div>
 
         <div className="respondent-field respondent-field--half">
-          <label htmlFor="respondent-age">Umur</label>
+          <label htmlFor="respondent-age">Umur <span>*</span></label>
           <div className="respondent-input-with-suffix">
             <input
               id="respondent-age"
@@ -224,14 +262,15 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
               placeholder="Contoh: 22"
               value={profile.age}
               onChange={onChange}
+              required
             />
             <span>tahun</span>
           </div>
         </div>
 
         <div className="respondent-field respondent-field--half">
-          <label htmlFor="respondent-gender">Gender</label>
-          <select id="respondent-gender" name="gender" value={profile.gender} onChange={onChange}>
+          <label htmlFor="respondent-gender">Gender <span>*</span></label>
+          <select id="respondent-gender" name="gender" value={profile.gender} onChange={onChange} required>
             <option value="">Pilih gender</option>
             <option value="male">Laki-laki</option>
             <option value="female">Perempuan</option>
@@ -241,7 +280,7 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
         </div>
 
         <div className="respondent-field respondent-field--full">
-          <label htmlFor="respondent-occupation">Pekerjaan</label>
+          <label htmlFor="respondent-occupation">Pekerjaan <span>*</span></label>
           <input
             id="respondent-occupation"
             name="occupation"
@@ -250,11 +289,22 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
             placeholder="Contoh: Mahasiswa"
             value={profile.occupation}
             onChange={onChange}
+            required
           />
         </div>
 
         <div className="respondent-field respondent-field--full">
-          <label htmlFor="respondent-email">Email</label>
+          <label htmlFor="respondent-province">Domisili <span>*</span></label>
+          <select id="respondent-province" name="province" value={profile.province} onChange={onChange} required>
+            <option value="">Pilih provinsi</option>
+            {PROVINCES.map((p) => (
+              <option key={p.code} value={p.code}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="respondent-field respondent-field--full">
+          <label htmlFor="respondent-email">Email <span>*</span></label>
           <input
             id="respondent-email"
             name="email"
@@ -263,6 +313,7 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
             placeholder="nama@email.com"
             value={profile.email}
             onChange={onChange}
+            required
           />
         </div>
 
@@ -396,12 +447,28 @@ export default function RespondentEligibilityPage() {
       setProfileError('Nama wajib diisi sebelum memulai evaluasi.')
       return
     }
-    if (profile.age !== '' && (!Number.isInteger(age) || age < 0)) {
-      setProfileError('Umur harus berupa bilangan bulat 0 atau lebih.')
+    if (profile.age === '' || !Number.isInteger(age) || age < 0) {
+      setProfileError('Umur wajib diisi dengan bilangan bulat 0 atau lebih.')
       return
     }
-    if (profile.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email.trim())) {
-      setProfileError('Gunakan format email yang valid atau kosongkan kolom email.')
+    if (!profile.gender) {
+      setProfileError('Gender wajib dipilih.')
+      return
+    }
+    if (!profile.occupation.trim()) {
+      setProfileError('Pekerjaan wajib diisi.')
+      return
+    }
+    if (!profile.province) {
+      setProfileError('Domisili wajib dipilih.')
+      return
+    }
+    if (!profile.email.trim()) {
+      setProfileError('Email wajib diisi.')
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email.trim())) {
+      setProfileError('Gunakan format email yang valid.')
       return
     }
 
@@ -410,10 +477,11 @@ export default function RespondentEligibilityPage() {
     try {
       const respondent = await startRespondent(token, {
         name,
-        email: profile.email.trim() || undefined,
+        email: profile.email.trim(),
         age,
-        gender: profile.gender || undefined,
-        occupation: profile.occupation.trim() || undefined,
+        gender: profile.gender,
+        occupation: profile.occupation.trim(),
+        province: profile.province,
         checked_criteria_ids: [...checkedCriteriaIds],
       })
       setSubmittedRespondent(respondent)

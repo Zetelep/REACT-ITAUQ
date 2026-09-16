@@ -1399,6 +1399,7 @@ Starts a respondent session for this evaluation link. If the questionnaire has a
   "age": 22,
   "gender": "male",
   "occupation": "Mahasiswa",
+  "province": "63",
   "checked_criteria_ids": [
     "ee0e8400-e29b-41d4-a716-446655440000",
     "ff0e8400-e29b-41d4-a716-446655440000"
@@ -1413,6 +1414,7 @@ Starts a respondent session for this evaluation link. If the questionnaire has a
 | `age` | integer | No | Age (must be ≥ 0) |
 | `gender` | string | No | `male`, `female`, `other`, or `prefer_not_to_say` |
 | `occupation` | string | No | Job/role |
+| `province` | string | No | 2-digit BPS province code (e.g. `"63"` for Kalimantan Selatan) |
 | `checked_criteria_ids` | uuid[] | Conditional | The IDs of the criteria the respondent has confirmed. Required only when the questionnaire has at least one active criterion; ignored otherwise. Each ID must be a criterion of the questionnaire, and the union must cover every active criterion (extra stale IDs are tolerated). |
 
 **Response (201 Created):**
@@ -1754,7 +1756,8 @@ Full per-respondent detail: identity, per-category ITAUQ scores, per-task result
       "name": "Ahmad",
       "age": 22,
       "gender": "male",
-      "occupation": "Mahasiswa"
+      "occupation": "Mahasiswa",
+      "province": "63"
     },
     "overall_usability_score": 82.14,
     "category_scores": [
@@ -1919,6 +1922,7 @@ Aggregate report across **all** respondents of one questionnaire — the "Genera
 | `age` | integer | Respondent age |
 | `gender` | enum | `male`, `female`, `other`, `prefer_not_to_say` |
 | `occupation` | text | Respondent occupation |
+| `province` | text | 2-digit BPS province code |
 | `extra_data` | jsonb | Additional data |
 | `started_at` | timestamp | Session start |
 | `submitted_at` | timestamp | Submission time |
