@@ -120,7 +120,7 @@ function ReportList() {
       setError('')
       try {
         const params = { page, page_size: 20 }
-        if (!isSuperAdmin && profile?.id) {
+        if (profile?.id) {
           params.administrator_id = profile.id
         }
         const result = await api.get('/questionnaires', { params, includeMeta: true })
