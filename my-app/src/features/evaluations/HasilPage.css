@@ -866,6 +866,15 @@
   .hasil-metrics-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .hasil-task-section {
+    padding: 16px;
+  }
+
+  .hasil-task-table td small {
+    white-space: normal;
+    max-width: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -931,5 +940,27 @@
   .hasil-board-header {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .hasil-hero-eyebrow {
+    font-size: 0.52rem;
+  }
+
+  .hasil-hero-title-group h1 {
+    font-size: 1.1rem;
+  }
+
+  .hasil-task-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .hasil-task-table th,
+  .hasil-task-table td {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+
+  .hasil-task-table td strong {
+    font-size: 0.78rem;
   }
 }
