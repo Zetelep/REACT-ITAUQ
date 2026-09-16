@@ -472,15 +472,19 @@
   position: fixed;
   z-index: 20;
   inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(23, 54, 50, 0.48);
-  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  /* Solid scrim instead of backdrop-filter: blur() — the blur forced full-area
+     recompositing on every paint while the dialog was open (same fix as AdminLayout) */
+  background: rgba(23, 54, 50, 0.58);
   padding: 24px;
 }
 
 .task-start-dialog {
   width: min(500px, 100%);
+  margin: auto;
   border: 1px solid #c9ded7;
   border-radius: 24px;
   background: #fff;
@@ -567,6 +571,114 @@
 
 .task-start-button span {
   font-size: 1.15rem;
+}
+
+.task-dialog-website {
+  margin-top: 20px;
+  border: 1px solid #c9ded7;
+  border-radius: 16px;
+  background: #f7fcfa;
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.task-dialog-website-label {
+  display: block;
+  color: #6b827b;
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.task-dialog-website-name {
+  margin: 9px 0 0;
+  color: var(--task-ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.task-dialog-website-link {
+  display: block;
+  margin-top: 5px;
+  color: var(--task-primary-dark);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  word-break: break-all;
+  user-select: all;
+}
+
+.task-dialog-website-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.task-dialog-open-button {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--task-primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 10px 14px;
+  box-shadow: 0 8px 16px rgba(29, 119, 103, 0.16);
+  transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.task-dialog-open-button:hover,
+.task-dialog-open-button:focus-visible {
+  background: var(--task-primary-dark);
+  box-shadow: 0 11px 20px rgba(29, 119, 103, 0.22);
+  transform: translateY(-1px);
+}
+
+.task-dialog-copy-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--task-primary);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--task-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.task-dialog-copy-button:hover,
+.task-dialog-copy-button:focus-visible {
+  background: var(--task-primary);
+  color: #fff;
+}
+
+.task-dialog-website-hint {
+  margin: 12px 0 0;
+  color: var(--task-ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.task-dialog-notice {
+  margin-top: 14px;
+  border-radius: 10px;
+  background: var(--task-primary-soft);
+  color: var(--task-primary-dark);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  padding: 10px 13px;
+  text-align: left;
 }
 
 /* Interstitial dialog (between tasks) */
@@ -880,6 +992,18 @@
   .task-notes-card {
     margin-top: 25px;
     padding: 21px 18px;
+  }
+
+  .task-start-dialog {
+    padding: 26px 20px 24px;
+  }
+
+  .task-dialog-website {
+    padding: 14px 15px;
+  }
+
+  .task-dialog-website-actions {
+    flex-direction: column;
   }
 }
 

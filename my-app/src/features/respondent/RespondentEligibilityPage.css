@@ -799,6 +799,116 @@
   }
 }
 
+.respondent-modal-overlay {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  background: rgba(16, 48, 42, 0.58);
+  padding: 24px;
+}
+
+.respondent-modal {
+  width: min(520px, 100%);
+  margin: auto;
+  border: 1px solid var(--respondent-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(14, 45, 39, 0.3);
+  padding: 30px 32px 28px;
+  animation: respondent-modal-rise 220ms ease-out;
+}
+
+@keyframes respondent-modal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.respondent-modal-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--respondent-primary-soft);
+  color: var(--respondent-primary);
+  font-size: 1.4rem;
+}
+
+.respondent-modal h2 {
+  margin-top: 7px;
+  color: var(--respondent-ink);
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.respondent-modal p {
+  margin-top: 10px;
+  color: var(--respondent-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.respondent-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.respondent-modal-list li {
+  position: relative;
+  padding-left: 25px;
+  color: var(--respondent-ink);
+  font-size: 0.79rem;
+  line-height: 1.5;
+}
+
+.respondent-modal-list li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--respondent-primary);
+  content: "✓";
+  font-weight: 900;
+}
+
+.respondent-modal-list strong {
+  font-weight: 800;
+}
+
+.respondent-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.respondent-modal-actions .respondent-back-button {
+  white-space: nowrap;
+}
+
+.respondent-modal-actions .respondent-submit-button {
+  flex: 1;
+  width: auto;
+  margin: 0;
+}
+
 @media (max-width: 920px) {
   .respondent-shell {
     padding-inline: 28px;
@@ -940,5 +1050,18 @@
     width: calc(100% - 36px);
     margin-left: 18px;
     margin-right: 18px;
+  }
+
+  .respondent-modal {
+    padding: 24px 20px 22px;
+  }
+
+  .respondent-modal-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .respondent-modal-actions .respondent-back-button {
+    width: 100%;
   }
 }

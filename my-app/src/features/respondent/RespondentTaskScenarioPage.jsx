@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ApiError } from '../../shared/api/apiClient'
+import { lockBodyScroll } from '../../shared/clients/scrollLock'
 import { submitTaskAttempts } from './respondentApi'
 import './RespondentTaskScenarioPage.css'
 
@@ -55,6 +56,22 @@ function getWebsiteUrl(appName, appLink) {
   return ''
 }
 
+async function writeToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+  }
+}
+
 
 export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName, appLink, token, respondentId, onFinished }) {
   const tasks = useMemo(() => sortTasks(sourceTasks || []), [sourceTasks])
@@ -71,6 +88,7 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   const [error, setError] = useState('')
   const [websiteNotice, setWebsiteNotice] = useState('')
   const [copied, setCopied] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const currentTask = tasks[currentIndex]
   const websiteUrl = getWebsiteUrl(appName, appLink)
   const completedCount = currentIndex
@@ -94,12 +112,8 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
   }, [currentIndex, isStarted])
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    if (!isStarted) document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
+    if (isStarted) return undefined
+    return lockBodyScroll()
   }, [isStarted])
 
   useEffect(() => {
@@ -108,23 +122,15 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
 
   const handleCopyInstruction = async () => {
     const instructionText = `${currentTask.title || `Skenario tugas ${currentIndex + 1}`}\n\n${currentTask.instruction || 'Ikuti instruksi dari peneliti untuk menyelesaikan tugas ini.'}`
-    try {
-      await navigator.clipboard.writeText(instructionText)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Fallback for older browsers
-      const textarea = document.createElement('textarea')
-      textarea.value = instructionText
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textarea)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
+    await writeToClipboard(instructionText)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleCopyWebsiteLink = async () => {
+    await writeToClipboard(websiteUrl)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
   }
 
   if (!currentTask) return null
@@ -306,6 +312,36 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
                 <li>Kembali ke halaman ini untuk menandai tugas selesai atau gagal.</li>
                 <li>Pilih "Saya Gagal Menyelesaikan" jika mengalami kendala teknis.</li>
               </ul>
+
+              <div className="task-dialog-website">
+                <span className="task-dialog-website-label">Website yang akan dievaluasi</span>
+                {websiteUrl ? (
+                  <>
+                    <p className="task-dialog-website-name">{appName}</p>
+                    <span className="task-dialog-website-link">{websiteUrl}</span>
+                    <div className="task-dialog-website-actions">
+                      <button className="task-dialog-open-button" type="button" onClick={handleOpenWebsite}>
+                        Buka Website Sekarang <span aria-hidden="true">↗</span>
+                      </button>
+                      <button className="task-dialog-copy-button" type="button" onClick={handleCopyWebsiteLink}>
+                        {linkCopied ? '✓ Tersalin' : 'Salin Tautan'}
+                      </button>
+                    </div>
+                    <p className="task-dialog-website-hint">
+                      Ingin mengerjakan dari perangkat lain (misalnya HP)? Buka tautan di atas di perangkat tersebut, lalu
+                      kembali ke halaman ini untuk menandai setiap tugas. Website boleh dibuka lebih dulu sebelum Anda menekan
+                      tombol mulai.
+                    </p>
+                  </>
+                ) : (
+                  <p className="task-dialog-website-hint">
+                    Tautan website belum tersedia pada data evaluasi ini. Silakan minta tautan kepada peneliti sebelum memulai.
+                  </p>
+                )}
+              </div>
+
+              {websiteNotice && <div className="task-dialog-notice" role="status">{websiteNotice}</div>}
+
               <button className="task-start-button" type="button" onClick={() => setIsStarted(true)}>
                 Mulai Skenario <span aria-hidden="true">→</span>
               </button>

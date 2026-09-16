@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ApiError } from '../../shared/api/apiClient'
+import { lockBodyScroll } from '../../shared/clients/scrollLock'
 import { getPublicEvaluation, startRespondent } from './respondentApi'
 import RespondentTaskScenarioPage from './RespondentTaskScenarioPage'
 import RespondentQuestionnairePage from './RespondentQuestionnairePage'
@@ -336,6 +337,46 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
   )
 }
 
+function ScenarioBriefingDialog({ taskCount, estimateMinutes, submitting, onConfirm, onCancel }) {
+  const hasTasks = taskCount > 0
+
+  return (
+    <div className="respondent-modal-overlay" role="presentation">
+      <section
+        className="respondent-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="briefing-heading"
+        aria-describedby="briefing-description"
+      >
+        <div className="respondent-modal-icon" aria-hidden="true">◷</div>
+        <span className="respondent-card-kicker">Sebelum melanjutkan</span>
+        <h2 id="briefing-heading">Siap mengerjakan skenario tugas?</h2>
+        <p id="briefing-description">
+          {hasTasks
+            ? `Anda akan mengerjakan ${taskCount} skenario tugas pada aplikasi yang dievaluasi. Setiap skenario meminta Anda mencoba satu fitur tertentu, lalu menandai apakah tugas berhasil atau gagal diselesaikan.`
+            : 'Setelah ini Anda akan langsung mengisi kuesioner usability untuk aplikasi yang dievaluasi.'}
+        </p>
+        <ul className="respondent-modal-list">
+          <li><strong>Perkiraan waktu ± {estimateMinutes} menit.</strong> Kerjakan dalam satu sesi sampai selesai.</li>
+          <li>Dibutuhkan fokus penuh — hindari gangguan selama mengerjakan.</li>
+          <li>Jangan menutup atau me-refresh halaman ini; waktu pengerjaan tiap tugas dicatat otomatis.</li>
+          <li>Tidak ada jawaban benar atau salah. Pilih "Saya Gagal Menyelesaikan" bila mengalami kendala teknis.</li>
+        </ul>
+        <div className="respondent-modal-actions">
+          <button className="respondent-back-button" type="button" onClick={onCancel} disabled={submitting}>
+            Periksa Data Lagi
+          </button>
+          <button className="respondent-submit-button" type="button" onClick={onConfirm} disabled={submitting}>
+            {submitting ? 'Menyimpan...' : 'Saya Mengerti, Mulai'}
+            {!submitting && <span aria-hidden="true">→</span>}
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 export default function RespondentEligibilityPage() {
   const { token = '' } = useParams()
   const [evaluation, setEvaluation] = useState(null)
@@ -353,6 +394,7 @@ export default function RespondentEligibilityPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [profileError, setProfileError] = useState('')
+  const [showBriefing, setShowBriefing] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
@@ -361,6 +403,11 @@ export default function RespondentEligibilityPage() {
       storeFlowStep(token, flowStep)
     }
   }, [flowStep, submittedRespondent, token])
+
+  useEffect(() => {
+    if (!showBriefing) return undefined
+    return lockBodyScroll()
+  }, [showBriefing])
 
   useEffect(() => {
     let mounted = true
@@ -412,6 +459,10 @@ export default function RespondentEligibilityPage() {
   const appLink = questionnaire.app_link || ''
   const taskScenarios = evaluation?.task_scenarios || []
   const isProfileStep = flowStep === 'profile'
+  const briefingEstimateMinutes = taskScenarios.length > 0
+    ? Math.ceil((taskScenarios.length * 3 + 7) / 5) * 5
+    : 10
+  const showBriefingDialog = showBriefing && isProfileStep && !submittedRespondent
 
   const toggleCriteria = (criterionId) => {
     setCheckedCriteriaIds((current) => {
@@ -438,44 +489,24 @@ export default function RespondentEligibilityPage() {
     setProfileError('')
   }
 
-  const handleProfileSubmit = async (event) => {
-    event.preventDefault()
+  const validateProfile = () => {
     const name = profile.name.trim()
     const age = profile.age === '' ? undefined : Number(profile.age)
 
-    if (!name) {
-      setProfileError('Nama wajib diisi sebelum memulai evaluasi.')
-      return
-    }
+    if (!name) return { error: 'Nama wajib diisi sebelum memulai evaluasi.' }
     if (profile.age === '' || !Number.isInteger(age) || age < 0) {
-      setProfileError('Umur wajib diisi dengan bilangan bulat 0 atau lebih.')
-      return
+      return { error: 'Umur wajib diisi dengan bilangan bulat 0 atau lebih.' }
     }
-    if (!profile.gender) {
-      setProfileError('Gender wajib dipilih.')
-      return
-    }
-    if (!profile.occupation.trim()) {
-      setProfileError('Pekerjaan wajib diisi.')
-      return
-    }
-    if (!profile.province) {
-      setProfileError('Domisili wajib dipilih.')
-      return
-    }
-    if (!profile.email.trim()) {
-      setProfileError('Email wajib diisi.')
-      return
-    }
+    if (!profile.gender) return { error: 'Gender wajib dipilih.' }
+    if (!profile.occupation.trim()) return { error: 'Pekerjaan wajib diisi.' }
+    if (!profile.province) return { error: 'Domisili wajib dipilih.' }
+    if (!profile.email.trim()) return { error: 'Email wajib diisi.' }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email.trim())) {
-      setProfileError('Gunakan format email yang valid.')
-      return
+      return { error: 'Gunakan format email yang valid.' }
     }
 
-    setSubmitting(true)
-    setProfileError('')
-    try {
-      const respondent = await startRespondent(token, {
+    return {
+      data: {
         name,
         email: profile.email.trim(),
         age,
@@ -483,11 +514,39 @@ export default function RespondentEligibilityPage() {
         occupation: profile.occupation.trim(),
         province: profile.province,
         checked_criteria_ids: [...checkedCriteriaIds],
-      })
+      },
+    }
+  }
+
+  const handleProfileSubmit = (event) => {
+    event.preventDefault()
+    const { error: validationError } = validateProfile()
+    if (validationError) {
+      setProfileError(validationError)
+      return
+    }
+    setProfileError('')
+    setShowBriefing(true)
+  }
+
+  const handleConfirmStart = async () => {
+    const { data, error: validationError } = validateProfile()
+    if (validationError) {
+      setProfileError(validationError)
+      setShowBriefing(false)
+      return
+    }
+
+    setSubmitting(true)
+    setProfileError('')
+    try {
+      const respondent = await startRespondent(token, data)
       setSubmittedRespondent(respondent)
       storeRespondent(token, respondent)
+      setShowBriefing(false)
       setFlowStep(taskScenarios.length > 0 ? 'tasks' : 'questionnaire')
     } catch (requestError) {
+      setShowBriefing(false)
       setProfileError(getErrorMessage(requestError, 'Data diri belum dapat disimpan. Silakan coba lagi.'))
     } finally {
       setSubmitting(false)
@@ -610,6 +669,16 @@ export default function RespondentEligibilityPage() {
           )}
         </div>
       </div>
+
+      {showBriefingDialog && (
+        <ScenarioBriefingDialog
+          taskCount={taskScenarios.length}
+          estimateMinutes={briefingEstimateMinutes}
+          submitting={submitting}
+          onConfirm={handleConfirmStart}
+          onCancel={() => setShowBriefing(false)}
+        />
+      )}
     </main>
   )
 }
