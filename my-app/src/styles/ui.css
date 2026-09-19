@@ -1,0 +1,37 @@
+/* Shared component chrome.
+ *
+ * Only controls that were genuinely duplicated across feature stylesheets live here.
+ * Feature files keep their contextual overrides (size, spacing) — this file owns the
+ * component's identity and its state colours.
+ */
+
+/* ─── Status badge ───
+   Previously declared twice, with two different variant vocabularies:
+   `waiting` / `done` in AdminLayout.css and `badge-pending` / `badge-approved` /
+   `badge-rejected` in AccountRequestsPage.css. Same component, same three colours.
+   The values below are the ones the cascade was already resolving to. */
+.status-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-badge.badge-pending {
+  background: var(--warning-tint);
+  color: var(--warning-ink);
+}
+
+.status-badge.badge-approved {
+  background: var(--success-tint);
+  color: var(--success-ink);
+}
+
+.status-badge.badge-rejected {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
