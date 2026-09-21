@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useId, useRef, useState, useCallback } from 'react'
 import { api } from '../../shared/api/apiClient'
+import { useModalDialog } from '../../shared/clients/modalDialog'
+import ConfirmDialog from '../../shared/ui/ConfirmDialog'
 import './AccountRequestsPage.css'
 
 export default function AccountRequestsPage() {
@@ -10,8 +12,17 @@ export default function AccountRequestsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [rejectModal, setRejectModal] = useState(null)
+  const [approveTarget, setApproveTarget] = useState(null)
   const [reviewNote, setReviewNote] = useState('')
   const [actionLoading, setActionLoading] = useState(null)
+  const rejectDialogRef = useRef(null)
+  const rejectTitleId = useId()
+
+  useModalDialog({
+    open: Boolean(rejectModal),
+    dialogRef: rejectDialogRef,
+    onClose: () => setRejectModal(null),
+  })
 
   const fetchApplications = useCallback(async () => {
     setLoading(true)
@@ -42,13 +53,14 @@ export default function AccountRequestsPage() {
   }
 
   const handleApprove = async (id) => {
-    if (!window.confirm('Setujui pengajuan ini? Akun administrator akan dibuat.')) return
     setActionLoading(id)
+    setError('')
     try {
       await api.patch(`/applications/${id}/approve`)
+      setApproveTarget(null)
       fetchApplications()
     } catch (err) {
-      alert(err.message || 'Gagal menyetujui pengajuan.')
+      setError(err.message || 'Gagal menyetujui pengajuan.')
     } finally {
       setActionLoading(null)
     }
@@ -62,13 +74,14 @@ export default function AccountRequestsPage() {
   const handleReject = async () => {
     if (!rejectModal) return
     setActionLoading(rejectModal)
+    setError('')
     try {
       await api.patch(`/applications/${rejectModal}/reject`, { review_note: reviewNote || undefined })
       setRejectModal(null)
       setReviewNote('')
       fetchApplications()
     } catch (err) {
-      alert(err.message || 'Gagal menolak pengajuan.')
+      setError(err.message || 'Gagal menolak pengajuan.')
     } finally {
       setActionLoading(null)
     }
@@ -97,6 +110,7 @@ export default function AccountRequestsPage() {
             className="filter-select"
             value={statusFilter}
             onChange={handleFilterChange}
+            aria-label="Filter status pengajuan"
           >
             <option value="">Semua Status</option>
             <option value="pending">Menunggu</option>
@@ -106,11 +120,11 @@ export default function AccountRequestsPage() {
         </div>
       </div>
 
-      {error && <div className="page-error">{error}</div>}
+      {error && <div className="page-error" role="alert">{error}</div>}
 
       <div className="data-table-card">
         {loading ? (
-          <div className="table-loading">Memuat data...</div>
+          <div className="table-loading" role="status">Memuat data...</div>
         ) : applications.length === 0 ? (
           <div className="table-empty">Tidak ada pengajuan ditemukan.</div>
         ) : (
@@ -143,19 +157,23 @@ export default function AccountRequestsPage() {
                         <div className="action-btns">
                           <button
                             className="action-btn approve"
-                            onClick={() => handleApprove(app.id)}
+                            type="button"
+                            onClick={() => setApproveTarget(app)}
                             disabled={actionLoading === app.id}
                             title="Setujui"
+                            aria-label={`Setujui pengajuan ${app.full_name}`}
                           >
-                            {actionLoading === app.id ? '...' : '✓'}
+                            <span aria-hidden="true">{actionLoading === app.id ? '…' : '✓'}</span>
                           </button>
                           <button
                             className="action-btn reject"
+                            type="button"
                             onClick={() => openRejectModal(app.id)}
                             disabled={actionLoading === app.id}
                             title="Tolak"
+                            aria-label={`Tolak pengajuan ${app.full_name}`}
                           >
-                            ✗
+                            <span aria-hidden="true">✗</span>
                           </button>
                         </div>
                       )}
@@ -191,22 +209,32 @@ export default function AccountRequestsPage() {
       {/* Reject Modal */}
       {rejectModal && (
         <div className="modal-overlay" onClick={() => setRejectModal(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Tolak Pengajuan</h2>
+          <div
+            ref={rejectDialogRef}
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={rejectTitleId}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="modal-title" id={rejectTitleId}>Tolak Pengajuan</h2>
             <p className="modal-desc">Berikan catatan alasan penolakan (opsional).</p>
             <textarea
               className="modal-textarea"
               value={reviewNote}
               onChange={(e) => setReviewNote(e.target.value)}
               placeholder="Contoh: Data institusi tidak dapat diverifikasi."
+              aria-label="Catatan alasan penolakan"
               rows={3}
             />
             <div className="modal-actions">
-              <button className="modal-btn cancel" onClick={() => setRejectModal(null)}>
+              <button className="modal-btn cancel" type="button" onClick={() => setRejectModal(null)}>
                 Batal
               </button>
               <button
                 className="modal-btn confirm-reject"
+                type="button"
                 onClick={handleReject}
                 disabled={actionLoading !== null}
               >
@@ -215,6 +243,17 @@ export default function AccountRequestsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {approveTarget && (
+        <ConfirmDialog
+          title="Setujui pengajuan"
+          description={`Akun administrator untuk ${approveTarget.full_name} (${approveTarget.email}) akan dibuat dan undangannya dikirim lewat email.`}
+          confirmLabel={actionLoading === approveTarget.id ? 'Menyetujui…' : 'Setujui pengajuan'}
+          busy={actionLoading === approveTarget.id}
+          onConfirm={() => handleApprove(approveTarget.id)}
+          onClose={() => setApproveTarget(null)}
+        />
       )}
     </div>
   )

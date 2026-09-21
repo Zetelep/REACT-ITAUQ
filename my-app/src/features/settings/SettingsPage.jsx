@@ -67,6 +67,9 @@ export default function SettingsPage() {
   const initials = useMemo(() => getInitials(profile?.full_name, userEmail), [profile?.full_name, userEmail])
   const passwordProgress = Math.min(newPassword.length / 8, 1) * 100
   const passwordReady = newPassword.length >= 8 && newPassword === confirmPassword
+  const passwordErrorId = pwError ? 'settings-password-error' : null
+  const passwordHintId = newPassword && confirmPassword ? 'settings-password-hint' : null
+  const confirmDescribedBy = [passwordErrorId, passwordHintId].filter(Boolean).join(' ') || undefined
 
   const startEditName = () => {
     setEditName(profile?.full_name || '')
@@ -163,10 +166,8 @@ export default function SettingsPage() {
         <section className="settings-card settings-profile-card">
           <div className="settings-card-heading">
             <div>
-              <p className="settings-card-kicker">Profil utama</p>
               <h2 className="settings-card-title">Identitas akun</h2>
             </div>
-            <span className="settings-card-symbol" aria-hidden="true">✦</span>
           </div>
 
           <div className="settings-profile-summary">
@@ -231,18 +232,16 @@ export default function SettingsPage() {
             ) : (
               <div className="settings-readonly-field">{profile?.full_name || 'Belum diisi'}</div>
             )}
-            {nameError && <p className="settings-feedback settings-feedback-error">{nameError}</p>}
-            {nameSuccess && <p className="settings-feedback settings-feedback-success">{nameSuccess}</p>}
+            {nameError && <p className="settings-feedback settings-feedback-error" role="alert">{nameError}</p>}
+            {nameSuccess && <p className="settings-feedback settings-feedback-success" role="status">{nameSuccess}</p>}
           </form>
         </section>
 
         <section className="settings-card settings-account-card">
           <div className="settings-card-heading">
             <div>
-              <p className="settings-card-kicker">Detail akun</p>
               <h2 className="settings-card-title">Data akun</h2>
             </div>
-            <span className="settings-card-symbol settings-card-symbol--blue" aria-hidden="true">◎</span>
           </div>
 
           <div className="settings-detail-grid">
@@ -264,14 +263,11 @@ export default function SettingsPage() {
         <section className="settings-card settings-security-card">
           <div className="settings-card-heading">
             <div>
-              <p className="settings-card-kicker">Perlindungan akun</p>
               <h2 className="settings-card-title">Keamanan</h2>
             </div>
-            <span className="settings-card-symbol settings-card-symbol--orange" aria-hidden="true">⌁</span>
           </div>
 
           <div className="settings-security-intro">
-            <div className="settings-security-icon" aria-hidden="true">•••</div>
             <div>
               <strong>Perbarui password secara berkala</strong>
               <p>Gunakan minimal 8 karakter agar akun tetap terlindungi.</p>
@@ -279,8 +275,8 @@ export default function SettingsPage() {
           </div>
 
           <form className="settings-password-form" onSubmit={handleChangePassword}>
-            {pwError && <div className="settings-feedback settings-feedback-error">{pwError}</div>}
-            {pwSuccess && <div className="settings-feedback settings-feedback-success">{pwSuccess}</div>}
+            {pwError && <div className="settings-feedback settings-feedback-error" id="settings-password-error" role="alert">{pwError}</div>}
+            {pwSuccess && <div className="settings-feedback settings-feedback-success" role="status">{pwSuccess}</div>}
 
             <div className="settings-field">
               <label htmlFor="new-password">Password baru</label>
@@ -288,10 +284,13 @@ export default function SettingsPage() {
                 id="new-password"
                 className="settings-input"
                 type="password"
+                name="new-password"
                 value={newPassword}
                 onChange={(event) => setNewPassword(event.target.value)}
                 placeholder="Minimal 8 karakter"
                 autoComplete="new-password"
+                aria-invalid={Boolean(pwError)}
+                aria-describedby={passwordErrorId || undefined}
               />
               <div className="settings-password-meter" aria-hidden="true">
                 <span style={{ width: `${passwordProgress}%` }} />
@@ -304,18 +303,21 @@ export default function SettingsPage() {
                 id="confirm-password"
                 className="settings-input"
                 type="password"
+                name="confirm-password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Ketik ulang password baru"
                 autoComplete="new-password"
+                aria-invalid={Boolean(pwError)}
+                aria-describedby={confirmDescribedBy}
               />
             </div>
 
-            <button className="settings-primary-button" type="submit" disabled={pwSaving || !newPassword || !confirmPassword}>
+            <button className="settings-primary-button" type="submit" disabled={pwSaving}>
               {pwSaving ? 'Menyimpan...' : 'Simpan password'}
             </button>
             {newPassword && confirmPassword && (
-              <p className={`settings-password-hint${passwordReady ? ' is-ready' : ''}`}>
+              <p className={`settings-password-hint${passwordReady ? ' is-ready' : ''}`} id="settings-password-hint">
                 {passwordReady ? 'Password siap disimpan.' : 'Pastikan kedua password sama.'}
               </p>
             )}
@@ -323,9 +325,7 @@ export default function SettingsPage() {
         </section>
 
         <aside className="settings-card settings-help-card">
-          <div className="settings-help-mark" aria-hidden="true">?</div>
           <div>
-            <p className="settings-card-kicker">Butuh bantuan?</p>
             <h2 className="settings-card-title">Data terlindungi</h2>
             <p className="settings-help-copy">
               Perubahan nama dan password berlaku untuk sesi akun Anda. Data akses sensitif tidak ditampilkan di halaman ini.

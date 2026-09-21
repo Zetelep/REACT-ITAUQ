@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { api } from '../../shared/api/apiClient'
+import { useModalDialog } from '../../shared/clients/modalDialog'
+import ConfirmDialog from '../../shared/ui/ConfirmDialog'
 
 const PUBLIC_EVALUATION_URL_BASE = (import.meta.env.VITE_PUBLIC_EVALUATION_URL_BASE || 'https://itauq.site/e/').replace(/\/?$/, '/')
 
@@ -65,10 +67,19 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
   const [error, setError] = useState('')
   const [expiry, setExpiry] = useState('')
   const [editingLink, setEditingLink] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
   const [editExpiry, setEditExpiry] = useState('')
   const [editActive, setEditActive] = useState(true)
   const [actionLoading, setActionLoading] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
+  const dialogRef = useRef(null)
+  const linkDialogTitleId = useId()
+
+  useModalDialog({
+    open: Boolean(editingLink),
+    dialogRef,
+    onClose: () => setEditingLink(null),
+  })
 
   const fetchLinks = useCallback(async () => {
     if (!canView) return
@@ -78,7 +89,7 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
       const result = await api.get(`/questionnaires/${questionnaireId}/evaluation-links`)
       setLinks(getLinksResult(result).map(normalizeLink))
     } catch (err) {
-      setError(err.message || 'Gagal memuat evaluation link.')
+      setError(err.message || 'Gagal memuat tautan evaluasi.')
     } finally {
       setLoading(false)
     }
@@ -98,7 +109,7 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
       setLinks((current) => [normalizeLink(created), ...current])
       setExpiry('')
     } catch (err) {
-      setError(err.message || 'Gagal membuat evaluation link.')
+      setError(err.message || 'Gagal membuat tautan evaluasi.')
     } finally {
       setActionLoading(null)
     }
@@ -124,21 +135,21 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
       setLinks((current) => current.map((link) => link.id === updated.id ? normalizeLink(updated) : link))
       setEditingLink(null)
     } catch (err) {
-      setError(err.message || 'Gagal memperbarui evaluation link.')
+      setError(err.message || 'Gagal memperbarui tautan evaluasi.')
     } finally {
       setActionLoading(null)
     }
   }
 
   const handleDelete = async (link) => {
-    if (!window.confirm('Hapus evaluation link ini? Link tidak dapat digunakan lagi.')) return
     setActionLoading(`delete-${link.id}`)
     setError('')
     try {
       await api.del(`/evaluation-links/${link.id}`)
       setLinks((current) => current.filter((item) => item.id !== link.id))
+      setDeleteTarget(null)
     } catch (err) {
-      setError(err.message || 'Gagal menghapus evaluation link.')
+      setError(err.message || 'Gagal menghapus tautan evaluasi.')
     } finally {
       setActionLoading(null)
     }
@@ -188,9 +199,9 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
       {error && <div className="page-error evaluation-link-error" role="alert">{error}</div>}
 
       {loading ? (
-        <div className="resource-empty">Memuat evaluation link...</div>
+        <div className="resource-empty">Memuat tautan evaluasi…</div>
       ) : links.length === 0 ? (
-        <div className="resource-empty">Belum ada evaluation link untuk evaluasi ini.</div>
+        <div className="resource-empty">Belum ada tautan evaluasi untuk evaluasi ini.</div>
       ) : (
         <div className="evaluation-link-list">
           {links.map((link) => {
@@ -217,7 +228,7 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
                       className="text-action danger"
                       type="button"
                       disabled={actionLoading === `delete-${link.id}`}
-                      onClick={() => handleDelete(link)}
+                      onClick={() => setDeleteTarget(link)}
                     >
                       {actionLoading === `delete-${link.id}` ? 'Menghapus...' : 'Hapus'}
                     </button>
@@ -231,8 +242,16 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
 
       {editingLink && (
         <div className="modal-overlay" onClick={() => setEditingLink(null)}>
-          <div className="modal-card questionnaire-modal" onClick={(event) => event.stopPropagation()}>
-            <h2 className="modal-title">Edit Evaluation Link</h2>
+          <div
+            ref={dialogRef}
+            className="modal-card questionnaire-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={linkDialogTitleId}
+            tabIndex={-1}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 className="modal-title" id={linkDialogTitleId}>Ubah Tautan Evaluasi</h2>
             <form onSubmit={handleUpdate}>
               <div className="modal-field">
                 <label htmlFor="evaluation-link-active">Status Link</label>
@@ -255,6 +274,17 @@ export default function EvaluationLinksSection({ questionnaireId, canView, canCr
             </form>
           </div>
         </div>
+      )}
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Hapus tautan evaluasi"
+          description="Tautan ini akan dihentikan dan tidak dapat dipakai lagi oleh responden."
+          confirmLabel={actionLoading === `delete-${deleteTarget.id}` ? 'Menghapus…' : 'Hapus tautan'}
+          danger
+          busy={actionLoading === `delete-${deleteTarget.id}`}
+          onConfirm={() => handleDelete(deleteTarget)}
+          onClose={() => setDeleteTarget(null)}
+        />
       )}
     </section>
   )

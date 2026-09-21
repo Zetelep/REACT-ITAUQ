@@ -10,7 +10,7 @@ import { useAuth } from './providers/AuthProvider'
 function AppContent() {
   const { session, loading } = useAuth()
 
-  if (loading) return <div className="app-loading">Loading...</div>
+  if (loading) return <div className="app-loading" role="status">Memuat aplikasi…</div>
 
   return (
     <Routes>

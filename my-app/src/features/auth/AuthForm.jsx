@@ -10,11 +10,11 @@ export default function AuthForm() {
   const [message, setMessage] = useState({ text: '', type: '' })
   const [loading, setLoading] = useState(false)
   const [isSignUpMode, setIsSignUpMode] = useState(false)
-  const { signUp, signIn } = useAuth()
+  const { signIn } = useAuth()
 
   const handleSignin = async () => {
     if (!email || !password) {
-      setMessage({ text: 'Please fill in all fields.', type: 'error' })
+      setMessage({ text: 'Email dan password wajib diisi.', type: 'error' })
       return
     }
     setMessage({ text: '', type: '' })
@@ -22,25 +22,7 @@ export default function AuthForm() {
     const { error } = await signIn(email, password)
     setLoading(false)
     if (error) setMessage({ text: error.message, type: 'error' })
-    else setMessage({ text: 'Signed in successfully.', type: 'success' })
-  }
-
-  const handleSignup = async () => {
-    if (!email || !password) {
-      setMessage({ text: 'Please fill in all fields.', type: 'error' })
-      return
-    }
-    setMessage({ text: '', type: '' })
-    setLoading(true)
-    const { data, error } = await signUp(email, password)
-    setLoading(false)
-    if (error) setMessage({ text: error.message, type: 'error' })
-    else if (data?.session) setMessage({ text: 'Signed up and signed in.', type: 'success' })
-    else setMessage({ text: 'Sign-up successful! Check your email for confirmation.', type: 'success' })
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleSignin()
+    else setMessage({ text: 'Berhasil masuk.', type: 'success' })
   }
 
   if (isSignUpMode) {
@@ -51,7 +33,7 @@ export default function AuthForm() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <img src={logoItauq} alt="ITAUQ logo" />
+          <img src={logoItauq} alt="" width="34" height="34" />
           <span>ITAUQ</span>
         </div>
 
@@ -61,36 +43,42 @@ export default function AuthForm() {
         </div>
 
         {message.text && (
-          <div className={`auth-message ${message.type}`}>
+          <div className={`auth-message ${message.type}`} role={message.type === 'error' ? 'alert' : 'status'}>
             {message.text}
           </div>
         )}
 
-        <div className="auth-form" onKeyDown={handleKeyDown}>
+        <form
+          className="auth-form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSignin()
+          }}
+        >
           <div className="auth-field">
-            <label className="auth-field-label">Email</label>
+            <label className="auth-field-label" htmlFor="login-email">Email</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">✉</span>
               <input
+                id="login-email"
                 className="auth-field-input"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
+                spellCheck={false}
               />
             </div>
           </div>
 
           <div className="auth-field">
-            <div className="auth-field-row">
-              <label className="auth-field-label">Password</label>
-              <a href="#" className="auth-forgot-link">Lupa Password?</a>
-            </div>
+            <label className="auth-field-label" htmlFor="login-password">Password</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">🔒</span>
               <input
+                id="login-password"
                 className="auth-field-input"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
@@ -102,7 +90,7 @@ export default function AuthForm() {
 
           <button
             className={`auth-submit-btn${loading ? ' loading' : ''}`}
-            onClick={handleSignin}
+            type="submit"
             disabled={loading}
           >
             {loading && (
@@ -112,7 +100,7 @@ export default function AuthForm() {
             )}
             {loading ? 'Memproses...' : 'Login'}
           </button>
-        </div>
+        </form>
 
         <div className="auth-divider" />
 

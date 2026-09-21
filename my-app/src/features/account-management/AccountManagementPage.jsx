@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
+import { useModalDialog } from '../../shared/clients/modalDialog'
 import './AccountRequestsPage.css'
 
 export default function AccountManagementPage() {
@@ -24,6 +25,17 @@ export default function AccountManagementPage() {
   const [formOccupation, setFormOccupation] = useState('')
   const [formActive, setFormActive] = useState(true)
   const [formError, setFormError] = useState('')
+
+  const createDialogRef = useRef(null)
+  const editDialogRef = useRef(null)
+  const deleteDialogRef = useRef(null)
+  const createTitleId = useId()
+  const editTitleId = useId()
+  const deleteTitleId = useId()
+
+  useModalDialog({ open: createModal, dialogRef: createDialogRef, onClose: () => setCreateModal(false) })
+  useModalDialog({ open: Boolean(editModal), dialogRef: editDialogRef, onClose: () => setEditModal(null) })
+  useModalDialog({ open: Boolean(deleteConfirm), dialogRef: deleteDialogRef, onClose: () => setDeleteConfirm(null) })
 
   const fetchAdmins = useCallback(async () => {
     setLoading(true)
@@ -131,7 +143,7 @@ export default function AccountManagementPage() {
       setDeleteConfirm(null)
       fetchAdmins()
     } catch (err) {
-      alert(err.message || 'Gagal menghapus administrator.')
+      setFormError(err.message || 'Gagal menghapus administrator.')
     } finally {
       setActionLoading(null)
     }
@@ -157,11 +169,11 @@ export default function AccountManagementPage() {
         </div>
       </div>
 
-      {error && <div className="page-error">{error}</div>}
+      {error && <div className="page-error" role="alert">{error}</div>}
 
       <div className="data-table-card">
         {loading ? (
-          <div className="table-loading">Memuat data...</div>
+          <div className="table-loading" role="status">Memuat data...</div>
         ) : admins.length === 0 ? (
           <div className="table-empty">Tidak ada administrator ditemukan.</div>
         ) : (
@@ -207,17 +219,21 @@ export default function AccountManagementPage() {
                           <>
                             <button
                               className="action-btn edit"
+                              type="button"
                               onClick={() => openEditModal(admin)}
                               title="Edit data administrator"
+                              aria-label={`Edit data administrator ${admin.full_name}`}
                             >
-                              ✏
+                              <span aria-hidden="true">✏</span>
                             </button>
                             <button
                               className="action-btn delete"
+                              type="button"
                               onClick={() => setDeleteConfirm(admin)}
                               title="Hapus"
+                              aria-label={`Hapus administrator ${admin.full_name}`}
                             >
-                              🗑
+                              <span aria-hidden="true">🗑</span>
                             </button>
                           </>
                         )}
@@ -254,30 +270,48 @@ export default function AccountManagementPage() {
       {/* Create Modal */}
       {createModal && (
         <div className="modal-overlay" onClick={() => setCreateModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Tambah Administrator</h2>
+          <div
+            ref={createDialogRef}
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={createTitleId}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="modal-title" id={createTitleId}>Tambah Administrator</h2>
             <p className="modal-desc">Buat akun administrator baru. Undangan akan dikirim via email.</p>
             <form onSubmit={handleCreate}>
-              {formError && <div className="change-pw-error" style={{ marginBottom: 14 }}>{formError}</div>}
+              {formError && <div className="change-pw-error" id={`${createTitleId}-error`} role="alert" style={{ marginBottom: 14 }}>{formError}</div>}
               <div className="modal-field">
-                <label>Nama Lengkap</label>
+                <label htmlFor="admin-create-name">Nama Lengkap</label>
                 <input
+                  id="admin-create-name"
                   className="modal-input"
                   type="text"
+                  name="name"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Masukkan nama lengkap"
-                  autoFocus
+                  autoComplete="name"
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? `${createTitleId}-error` : undefined}
                 />
               </div>
               <div className="modal-field">
-                <label>Email</label>
+                <label htmlFor="admin-create-email">Email</label>
                 <input
+                  id="admin-create-email"
                   className="modal-input"
                   type="email"
+                  name="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="administrator@example.com"
+                  autoComplete="email"
+                  spellCheck={false}
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? `${createTitleId}-error` : undefined}
                 />
               </div>
               <div className="modal-actions">
@@ -296,41 +330,59 @@ export default function AccountManagementPage() {
       {/* Edit Modal */}
       {editModal && (
         <div className="modal-overlay" onClick={() => setEditModal(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Edit Administrator</h2>
+          <div
+            ref={editDialogRef}
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={editTitleId}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="modal-title" id={editTitleId}>Edit Administrator</h2>
             <p className="modal-desc">{editModal.email}</p>
             <form onSubmit={handleEdit}>
-              {formError && <div className="change-pw-error" style={{ marginBottom: 14 }}>{formError}</div>}
+              {formError && <div className="change-pw-error" id={`${editTitleId}-error`} role="alert" style={{ marginBottom: 14 }}>{formError}</div>}
               <div className="modal-field">
-                <label>Nama Lengkap</label>
+                <label htmlFor="admin-edit-name">Nama Lengkap</label>
                 <input
+                  id="admin-edit-name"
                   className="modal-input"
                   type="text"
+                  name="name"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  autoFocus
+                  autoComplete="name"
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? `${editTitleId}-error` : undefined}
                 />
               </div>
               {isSuperAdmin && (
                 <>
                   <div className="modal-field">
-                    <label>Institusi</label>
+                    <label htmlFor="admin-edit-institution">Institusi</label>
                     <input
+                      id="admin-edit-institution"
                       className="modal-input"
                       type="text"
+                      name="organization"
                       value={formInstitution}
                       onChange={(e) => setFormInstitution(e.target.value)}
                       placeholder="Nama institusi"
+                      autoComplete="organization"
                     />
                   </div>
                   <div className="modal-field">
-                    <label>Pekerjaan</label>
+                    <label htmlFor="admin-edit-occupation">Pekerjaan</label>
                     <input
+                      id="admin-edit-occupation"
                       className="modal-input"
                       type="text"
+                      name="organization-title"
                       value={formOccupation}
                       onChange={(e) => setFormOccupation(e.target.value)}
                       placeholder="Pekerjaan atau jabatan"
+                      autoComplete="organization-title"
                     />
                   </div>
                 </>
@@ -362,18 +414,28 @@ export default function AccountManagementPage() {
       {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Hapus Administrator</h2>
+          <div
+            ref={deleteDialogRef}
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={deleteTitleId}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="modal-title" id={deleteTitleId}>Hapus Administrator</h2>
+            {formError && <div className="change-pw-error" role="alert" style={{ marginBottom: 14 }}>{formError}</div>}
             <p className="modal-desc">
               Anda yakin ingin menghapus akun <strong>{deleteConfirm.full_name}</strong> ({deleteConfirm.email})?
               Tindakan ini akan menghapus semua data terkait (kuesioner, responden, dll) dan tidak dapat dibatalkan.
             </p>
             <div className="modal-actions">
-              <button className="modal-btn cancel" onClick={() => setDeleteConfirm(null)}>
+              <button className="modal-btn cancel" type="button" onClick={() => setDeleteConfirm(null)}>
                 Batal
               </button>
               <button
                 className="modal-btn confirm-reject"
+                type="button"
                 onClick={handleDelete}
                 disabled={actionLoading !== null}
               >

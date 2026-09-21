@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ApiError } from '../../shared/api/apiClient'
+import { scrollBehavior } from '../../shared/clients/modalDialog'
 import { submitEvaluation, submitItauqAnswers, submitSusAnswers } from './respondentApi'
 import './RespondentQuestionnairePage.css'
 
@@ -111,7 +112,6 @@ function QuestionnaireSubmitted({ appName, submittedAt }) {
     <main className="respondent-questionnaire-page respondent-questionnaire-page--centered">
       <div className="questionnaire-submitted-card">
         <div className="questionnaire-submitted-icon" aria-hidden="true">✓</div>
-        <span className="questionnaire-eyebrow">Jawaban terkirim</span>
         <h1>Terima kasih telah berpartisipasi</h1>
         <p>
           Jawaban Anda untuk evaluasi <strong>{appName}</strong> telah berhasil disimpan.
@@ -174,7 +174,7 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
       if (susQuestions.length > 0) {
         setInstrumentStep('sus')
         storeQuestionnaireState(token, { instrumentStep: 'sus', itauqAnswers, susAnswers })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        window.scrollTo({ top: 0, behavior: scrollBehavior() })
         return null
       }
     } else {
@@ -195,7 +195,7 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
     if (missingQuestion) {
       setError('Silakan jawab semua pertanyaan sebelum melanjutkan.')
       const missingId = `${isItauqStep ? 'itauq' : 'sus'}-${missingQuestion.id}-${activeScale[0]}`
-      document.getElementById(missingId)?.closest('.questionnaire-question')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      document.getElementById(missingId)?.closest('.questionnaire-question')?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })
       return
     }
 
@@ -241,7 +241,7 @@ export default function RespondentQuestionnairePage({ evaluation, appName, token
         <nav className="questionnaire-nav" aria-label="Navigasi evaluasi">
           <span className="questionnaire-nav-item">Skenario Tugas</span>
           <span className="questionnaire-nav-item is-active">Kuesioner</span>
-          <span className="questionnaire-help" aria-label="Bantuan">?</span>
+          <span className="questionnaire-help" aria-hidden="true">?</span>
         </nav>
       </header>
 

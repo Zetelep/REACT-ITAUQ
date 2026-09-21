@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
+import { useModalDialog, scrollBehavior } from '../../shared/clients/modalDialog'
 import './HasilPage.css'
 
 const CATEGORY_NAMES = [
@@ -161,7 +162,6 @@ function ReportList() {
     <div className="page-container hasil-page">
       <div className="page-header">
         <div>
-          <p className="page-eyebrow">ITAUQ</p>
           <h1>Hasil Evaluasi</h1>
           <p className="page-subtitle">Pantau skor usability dari seluruh evaluasi yang telah dilakukan.</p>
         </div>
@@ -172,7 +172,6 @@ function ReportList() {
       <section className="data-table-card hasil-board">
         <div className="hasil-board-header">
           <div>
-            <p className="board-eyebrow">Laporan</p>
             <h2>Daftar laporan evaluasi</h2>
             <p>Pilih evaluasi untuk melihat skor I-TAUQ, performa task, dan detail responden.</p>
           </div>
@@ -183,7 +182,6 @@ function ReportList() {
           <div className="table-loading">Memuat laporan evaluasi...</div>
         ) : questionnaires.length === 0 ? (
           <div className="table-empty">
-            <span className="empty-state-icon" aria-hidden="true">📊</span>
             <strong>Belum ada laporan.</strong>
             <span>Responden belum menyelesaikan evaluasi apa pun.</span>
           </div>
@@ -353,7 +351,6 @@ function ReportDetail({ questionnaireId }) {
       <section className="hasil-hero">
         <div className="hasil-hero-left">
           <div className="hasil-hero-info">
-            <p className="hasil-hero-eyebrow">INDONESIAN TOURISM USABILITY QUESTIONNAIRE DASHBOARD</p>
             <div className="hasil-hero-title-group">
               <p className="hasil-hero-app">{questionnaire?.app_name}</p>
               <h1>{questionnaire?.title}</h1>
@@ -368,11 +365,11 @@ function ReportDetail({ questionnaireId }) {
             <div className="hasil-score-meta">{report.respondent_count} responden</div>
           </div>
           <div className="hasil-hero-actions">
-            <button className="hasil-action-btn" onClick={() => document.getElementById('hasil-respondents')?.scrollIntoView({ behavior: 'smooth' })}>
-              <span>📋</span> Detail Responden
+            <button className="hasil-action-btn" onClick={() => document.getElementById('hasil-respondents')?.scrollIntoView({ behavior: scrollBehavior() })}>
+              Detail Responden
             </button>
             <button className="hasil-action-btn" onClick={() => navigate(`/admin/evaluasi/${questionnaireId}`)}>
-              <span>🔗</span> Kelola Evaluasi
+              Kelola Evaluasi
             </button>
           </div>
         </div>
@@ -521,6 +518,8 @@ function ReportDetail({ questionnaireId }) {
 
 function RespondentDetailModal({ respondent, onClose }) {
   const { profile } = useProfile()
+  const dialogRef = useRef(null)
+  const titleId = useId()
   const categoryScores = normalizeRespondentCategories(respondent.category_scores)
   const overallRaw = respondent.overall_usability_score != null
     ? normalizedToRaw(respondent.overall_usability_score)
@@ -529,11 +528,21 @@ function RespondentDetailModal({ respondent, onClose }) {
   // Only super_admin can see SUS Score
   const showSusScore = profile?.role === 'super_admin'
 
+  useModalDialog({ dialogRef, onClose })
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card hasil-respondent-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        className="modal-card hasil-respondent-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="hasil-respondent-modal-header">
-          <h2>{respondent.respondent?.name || 'Responden'}</h2>
+          <h2 id={titleId}>{respondent.respondent?.name || 'Responden'}</h2>
           <button className="modal-close-btn" onClick={onClose} aria-label="Tutup">&times;</button>
         </div>
 

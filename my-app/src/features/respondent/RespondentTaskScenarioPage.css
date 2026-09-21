@@ -1,15 +1,8 @@
 .task-scenario-page {
-  --task-ink: #173632;
-  --task-ink-soft: #617872;
-  --task-primary: #1d7767;
-  --task-primary-dark: #145c50;
-  --task-primary-soft: #e0f2ec;
-  --task-accent: #f0a36c;
-  --task-line: #dce9e4;
   min-height: 100vh;
   background: #f7fbf9;
-  color: var(--task-ink);
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--survey-ink);
+  font-family: var(--sans);
   text-align: left;
 }
 
@@ -33,16 +26,16 @@
   min-height: 72px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--task-line);
+  border-bottom: 1px solid var(--survey-line);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 5px 18px rgba(27, 86, 73, 0.04);
   padding: 0 29px;
 }
 
 .task-scenario-brand {
-  color: var(--task-ink);
-  font-size: clamp(1rem, 2vw, 1.35rem);
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.045em;
 }
 
@@ -57,20 +50,20 @@
   display: flex;
   height: 100%;
   align-items: center;
-  color: #9bada7;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   white-space: nowrap;
 }
 
 .task-scenario-nav-item.is-active {
-  border-bottom: 3px solid var(--task-primary);
-  color: var(--task-primary-dark);
-  font-weight: 800;
+  border-bottom: 3px solid var(--survey-primary);
+  color: var(--survey-primary-strong);
+  font-weight: var(--weight-bold);
 }
 
 .task-scenario-nav-item.is-disabled {
-  color: #9aaca7;
+  color: var(--survey-ink-soft);
 }
 
 .task-help-button {
@@ -78,19 +71,19 @@
   width: 27px;
   height: 27px;
   place-items: center;
-  border: 2px solid var(--task-primary);
+  border: 2px solid var(--survey-primary);
   border-radius: 50%;
   background: #fff;
-  color: var(--task-primary);
-  font-size: 0.9rem;
-  font-weight: 850;
+  color: var(--survey-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   line-height: 1;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
 .task-help-button:hover,
 .task-help-button:focus-visible {
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
 }
 
@@ -101,31 +94,31 @@
 }
 
 .task-scenario-sidebar {
-  border-right: 1px solid var(--task-line);
+  border-right: 1px solid var(--survey-line);
   background: rgba(255, 255, 255, 0.93);
   padding: 27px 19px 36px;
 }
 
 .task-eyebrow {
-  color: var(--task-primary);
-  font-size: 0.67rem;
-  font-weight: 850;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
 .task-sidebar-heading h1 {
   margin: 11px 0 7px;
-  color: var(--task-ink);
-  font-size: 1.3rem;
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.045em;
 }
 
 .task-sidebar-heading p {
   margin: 0;
-  color: #8aa09a;
-  font-size: 0.82rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
 }
 
 .task-instruction-card {
@@ -139,30 +132,30 @@
 
 .task-instruction-card strong {
   display: block;
-  color: var(--task-ink);
-  font-size: 0.88rem;
-  line-height: 1.3;
+  color: var(--survey-ink);
+  font-size: var(--text-sm);
+  line-height: var(--leading-heading);
 }
 
 .task-instruction-card p {
   margin: 8px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 0.82rem;
-  line-height: 1.45;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
   white-space: pre-line;
 }
 
 .task-elapsed-block {
   margin-top: 27px;
-  border-top: 1px solid var(--task-line);
+  border-top: 1px solid var(--survey-line);
   padding-top: 20px;
 }
 
 .task-sidebar-label {
   display: block;
-  color: #6b827b;
-  font-size: 0.66rem;
-  font-weight: 850;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.11em;
 }
 
@@ -171,16 +164,17 @@
   align-items: center;
   gap: 9px;
   margin-top: 12px;
-  color: var(--task-ink);
+  color: var(--survey-ink);
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 1.35rem;
+  font-size: var(--text-lg);
   letter-spacing: 0.02em;
 }
 
 .task-stopwatch {
-  color: var(--task-primary);
+  font-variant-numeric: tabular-nums;
+  color: var(--survey-primary);
   font-family: Arial, sans-serif;
-  font-size: 1.7rem;
+  font-size: var(--text-xl);
 }
 
 .task-sidebar-actions {
@@ -195,24 +189,24 @@
   width: 100%;
   min-height: 53px;
   border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 850;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.04em;
-  line-height: 1.2;
+  line-height: var(--leading-heading);
   padding: 8px 12px;
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
 }
 
 .task-success-button {
-  border: 1px solid var(--task-primary);
-  background: var(--task-primary);
+  border: 1px solid var(--survey-primary);
+  background: var(--survey-primary);
   color: #fff;
   box-shadow: 0 8px 17px rgba(29, 119, 103, 0.15);
 }
 
 .task-success-button:hover:not(:disabled) {
-  border-color: var(--task-primary-dark);
-  background: var(--task-primary-dark);
+  border-color: var(--survey-primary-strong);
+  background: var(--survey-primary-strong);
   box-shadow: 0 10px 20px rgba(29, 119, 103, 0.22);
 }
 
@@ -223,12 +217,12 @@
   gap: 9px;
   border: 1px solid #e2d7d1;
   background: #fffaf7;
-  color: #a66d50;
+  color: var(--survey-danger-ink);
 }
 
 .task-fail-button span {
-  color: #d4875f;
-  font-size: 1.1rem;
+  color: var(--survey-danger-ink);
+  font-size: var(--text-base);
 }
 
 .task-fail-button:hover:not(:disabled) {
@@ -261,15 +255,16 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--task-primary);
+  background: var(--survey-primary);
   transition: width 250ms ease;
 }
 
 .task-progress-count {
+  font-variant-numeric: tabular-nums;
   display: block;
   margin-top: 7px;
-  color: #748a84;
-  font-size: 0.7rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
   text-align: right;
 }
 
@@ -320,19 +315,19 @@
 
 .task-session-message h2 {
   margin: 0;
-  color: var(--task-ink);
-  font-size: clamp(1.8rem, 3.3vw, 2.95rem);
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.055em;
-  line-height: 1.05;
+  line-height: var(--leading-display);
   text-align: center;
 }
 
 .task-session-message p {
   margin: 32px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 1rem;
-  line-height: 1.45;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .task-session-message p + p {
@@ -346,10 +341,10 @@
   margin: 46px auto 0;
   border: 0;
   border-radius: 14px;
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
-  font-size: clamp(1rem, 2.2vw, 1.38rem);
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   padding: 14px 22px;
   box-shadow: 0 12px 22px rgba(29, 119, 103, 0.16);
@@ -358,7 +353,7 @@
 
 .task-open-website-button:hover:not(:disabled),
 .task-open-website-button:focus-visible:not(:disabled) {
-  background: var(--task-primary-dark);
+  background: var(--survey-primary-strong);
   box-shadow: 0 15px 26px rgba(29, 119, 103, 0.23);
   transform: translateY(-1px);
 }
@@ -394,29 +389,29 @@
   height: 30px;
   flex: 0 0 30px;
   place-items: center;
-  border: 2px solid var(--task-primary);
+  border: 2px solid var(--survey-primary);
   border-radius: 50%;
-  color: var(--task-primary);
-  font-size: 0.95rem;
-  font-weight: 900;
+  color: var(--survey-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
 }
 
 .task-message-box--error .task-message-icon {
-  border-color: #bd704d;
-  color: #bd704d;
+  border-color: var(--survey-danger-ink);
+  color: var(--survey-danger-ink);
 }
 
 .task-message-box strong {
   display: block;
-  color: var(--task-ink);
-  font-size: 1rem;
+  color: var(--survey-ink);
+  font-size: var(--text-base);
 }
 
 .task-message-box p {
   margin: 5px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 0.87rem;
-  line-height: 1.45;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 
 .task-notes-card {
@@ -431,9 +426,9 @@
 
 .task-notes-card label {
   display: block;
-  color: var(--task-ink);
-  font-size: 0.78rem;
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.04em;
 }
 
@@ -447,19 +442,19 @@
   border-radius: 12px;
   outline: 0;
   background: #fbfefd;
-  color: var(--task-ink);
-  font-size: 0.85rem;
-  line-height: 1.45;
+  color: var(--survey-ink);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
   padding: 13px;
 }
 
 .task-notes-card textarea:focus {
-  border-color: var(--task-primary);
+  border-color: var(--survey-primary);
   box-shadow: 0 0 0 3px rgba(29, 119, 103, 0.1);
 }
 
 .task-notes-card textarea::placeholder {
-  color: #a2b5af;
+  color: var(--survey-ink-soft);
 }
 
 .task-notes-card textarea:disabled {
@@ -500,32 +495,32 @@
   margin: 0 auto 18px;
   place-items: center;
   border-radius: 50%;
-  background: var(--task-primary-soft);
-  color: var(--task-primary);
-  font-size: 2rem;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary);
+  font-size: var(--text-2xl);
 }
 
 .task-start-dialog h2 {
   margin: 9px 0 0;
-  color: var(--task-ink);
-  font-size: clamp(1.55rem, 4vw, 2rem);
+  color: var(--survey-ink);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
-  line-height: 1.1;
+  line-height: var(--leading-display);
 }
 
 .task-start-dialog > p {
   margin: 14px auto 0;
-  color: var(--task-ink-soft);
-  font-size: 0.88rem;
-  line-height: 1.55;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 
 .task-start-checklist {
   margin: 20px 0 0;
   padding: 0;
-  color: var(--task-ink);
-  font-size: 0.78rem;
-  line-height: 1.55;
+  color: var(--survey-ink);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
   list-style: none;
   text-align: left;
 }
@@ -540,9 +535,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  color: var(--task-primary);
+  color: var(--survey-primary);
   content: "✓";
-  font-weight: 900;
+  font-weight: var(--weight-bold);
 }
 
 .task-start-button {
@@ -554,10 +549,10 @@
   margin-top: 25px;
   border: 0;
   border-radius: 12px;
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
-  font-size: 0.84rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   padding: 12px 24px;
   box-shadow: 0 10px 20px rgba(29, 119, 103, 0.17);
   transition: background-color 150ms ease, transform 150ms ease;
@@ -565,12 +560,12 @@
 
 .task-start-button:hover,
 .task-start-button:focus-visible {
-  background: var(--task-primary-dark);
+  background: var(--survey-primary-strong);
   transform: translateY(-1px);
 }
 
 .task-start-button span {
-  font-size: 1.15rem;
+  font-size: var(--text-lg);
 }
 
 .task-dialog-website {
@@ -584,28 +579,28 @@
 
 .task-dialog-website-label {
   display: block;
-  color: #6b827b;
-  font-size: 0.66rem;
-  font-weight: 850;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
 .task-dialog-website-name {
   margin: 9px 0 0;
-  color: var(--task-ink);
-  font-size: 0.95rem;
-  font-weight: 800;
-  line-height: 1.3;
+  color: var(--survey-ink);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-heading);
 }
 
 .task-dialog-website-link {
   display: block;
   margin-top: 5px;
-  color: var(--task-primary-dark);
+  color: var(--survey-primary-strong);
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 0.76rem;
-  line-height: 1.45;
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
   word-break: break-all;
   user-select: all;
 }
@@ -625,10 +620,10 @@
   gap: 8px;
   border: 0;
   border-radius: 10px;
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   padding: 10px 14px;
   box-shadow: 0 8px 16px rgba(29, 119, 103, 0.16);
   transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
@@ -636,7 +631,7 @@
 
 .task-dialog-open-button:hover,
 .task-dialog-open-button:focus-visible {
-  background: var(--task-primary-dark);
+  background: var(--survey-primary-strong);
   box-shadow: 0 11px 20px rgba(29, 119, 103, 0.22);
   transform: translateY(-1px);
 }
@@ -646,12 +641,12 @@
   min-height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--task-primary);
+  border: 1px solid var(--survey-primary);
   border-radius: 10px;
   background: #fff;
-  color: var(--task-primary);
-  font-size: 0.75rem;
-  font-weight: 700;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   padding: 10px 14px;
   white-space: nowrap;
   transition: background-color 150ms ease, color 150ms ease;
@@ -659,24 +654,24 @@
 
 .task-dialog-copy-button:hover,
 .task-dialog-copy-button:focus-visible {
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
 }
 
 .task-dialog-website-hint {
   margin: 12px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 0.72rem;
-  line-height: 1.5;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
 }
 
 .task-dialog-notice {
   margin-top: 14px;
   border-radius: 10px;
-  background: var(--task-primary-soft);
-  color: var(--task-primary-dark);
-  font-size: 0.74rem;
-  line-height: 1.45;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary-strong);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
   padding: 10px 13px;
   text-align: left;
 }
@@ -692,28 +687,28 @@
   gap: 8px;
   border-radius: 100px;
   padding: 8px 18px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
 }
 
 .task-interstitial-result[data-success="true"] {
-  background: var(--task-primary-soft);
-  color: var(--task-primary);
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary);
 }
 
 .task-interstitial-result[data-success="false"] {
   background: #fef3e5;
-  color: #b87333;
+  color: var(--warning-ink);
 }
 
 .task-interstitial-result-icon {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .task-interstitial-duration {
   margin: 12px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 0.78rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
   font-variant-numeric: tabular-nums;
 }
 
@@ -723,17 +718,17 @@
 
 .task-interstitial-next-label {
   margin: 20px 0 0;
-  color: var(--task-ink-soft);
-  font-size: 0.75rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .task-interstitial-next-task {
   margin: 10px auto 0;
   max-width: 340px;
-  border: 1px solid var(--task-line);
+  border: 1px solid var(--survey-line);
   border-radius: 12px;
   background: #f7fbf9;
   padding: 14px 18px;
@@ -742,16 +737,16 @@
 
 .task-interstitial-next-task strong {
   display: block;
-  color: var(--task-primary);
-  font-size: 0.72rem;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
   letter-spacing: 0.04em;
 }
 
 .task-interstitial-next-task p {
   margin: 4px 0 0;
-  color: var(--task-ink);
-  font-size: 0.84rem;
-  line-height: 1.45;
+  color: var(--survey-ink);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 
 .task-completion-page {
@@ -759,8 +754,8 @@
   min-height: 100vh;
   place-items: center;
   background: #f7fbf9;
-  color: var(--task-ink);
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--survey-ink);
+  font-family: var(--sans);
   padding: 24px;
   text-align: center;
 }
@@ -781,10 +776,10 @@
   margin: 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: var(--task-primary-soft);
-  color: var(--task-primary);
-  font-size: 2rem;
-  font-weight: 800;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
 }
 
 .task-completion-card .task-eyebrow {
@@ -794,25 +789,25 @@
 
 .task-completion-card h1 {
   margin: 11px 0 0;
-  color: var(--task-ink);
-  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  color: var(--survey-ink);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
-  line-height: 1.1;
+  line-height: var(--leading-display);
 }
 
 .task-completion-card p {
   margin: 18px auto 0;
-  color: var(--task-ink-soft);
-  font-size: 1rem;
-  line-height: 1.55;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .task-completion-next {
   margin-top: 28px;
   border-radius: 10px;
-  background: var(--task-primary-soft);
-  color: var(--task-primary-dark);
-  font-size: 0.85rem;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary-strong);
+  font-size: var(--text-sm);
   padding: 13px 15px;
 }
 
@@ -825,10 +820,10 @@
   margin-top: 22px;
   border: 0;
   border-radius: 12px;
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   padding: 12px 20px;
   box-shadow: 0 9px 18px rgba(29, 119, 103, 0.15);
   transition: background-color 150ms ease, transform 150ms ease;
@@ -836,12 +831,12 @@
 
 .task-completion-button:hover,
 .task-completion-button:focus-visible {
-  background: var(--task-primary-dark);
+  background: var(--survey-primary-strong);
   transform: translateY(-1px);
 }
 
 .task-completion-button span {
-  font-size: 1.1rem;
+  font-size: var(--text-base);
 }
 
 @media (max-width: 900px) {
@@ -868,7 +863,7 @@
 
   .task-session-message p {
     margin-top: 25px;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .task-open-website-button {
@@ -885,7 +880,7 @@
 
   .task-scenario-brand {
     max-width: 180px;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .task-scenario-nav {
@@ -893,7 +888,7 @@
   }
 
   .task-scenario-nav-item {
-    font-size: 0.76rem;
+    font-size: var(--text-2xs);
   }
 
   .task-scenario-layout {
@@ -902,13 +897,13 @@
 
   .task-scenario-sidebar {
     border-right: 0;
-    border-bottom: 1px solid var(--task-line);
+    border-bottom: 1px solid var(--survey-line);
     padding: 19px 16px 22px;
   }
 
   .task-sidebar-heading h1 {
     margin-top: 7px;
-    font-size: 1.1rem;
+    font-size: var(--text-base);
   }
 
   .task-instruction-card {
@@ -924,7 +919,7 @@
 
   .task-elapsed-block strong {
     margin-top: 8px;
-    font-size: 1.05rem;
+    font-size: var(--text-base);
   }
 
   .task-sidebar-actions {
@@ -939,7 +934,7 @@
   .task-success-button,
   .task-fail-button {
     min-height: 43px;
-    font-size: 0.64rem;
+    font-size: var(--text-2xs);
   }
 
   .task-progress-block {
@@ -964,20 +959,20 @@
   }
 
   .task-session-message h2 {
-    font-size: 1.65rem;
+    font-size: var(--text-xl);
   }
 
   .task-session-message p,
   .task-session-message p + p {
     margin-top: 18px;
-    font-size: 0.78rem;
+    font-size: var(--text-2xs);
   }
 
   .task-open-website-button {
     width: 100%;
     min-height: 58px;
     margin-top: 28px;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .task-message-box {
@@ -986,7 +981,7 @@
   }
 
   .task-message-box p {
-    font-size: 0.8rem;
+    font-size: var(--text-2xs);
   }
 
   .task-notes-card {
@@ -1015,22 +1010,30 @@
   gap: 6px;
   min-height: 36px;
   margin-top: 12px;
-  border: 1px solid var(--task-primary);
+  border: 1px solid var(--survey-primary);
   border-radius: 8px;
   background: #fff;
-  color: var(--task-primary);
-  font-size: 0.72rem;
-  font-weight: 600;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   padding: 6px 12px;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
 .task-copy-button:hover:not(:disabled) {
-  background: var(--task-primary);
+  background: var(--survey-primary);
   color: #fff;
 }
 
 .task-copy-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* iOS Safari zooms the viewport when a focused field's text is under 16px. The
+   floor applies on small screens; the desktop size is unchanged. */
+@media (max-width: 640px) {
+  .task-notes-card textarea {
+    font-size: var(--text-base);
+  }
 }

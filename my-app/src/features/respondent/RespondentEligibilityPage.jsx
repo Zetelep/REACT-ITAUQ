@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ApiError } from '../../shared/api/apiClient'
 import { lockBodyScroll } from '../../shared/clients/scrollLock'
+import { useModalDialog } from '../../shared/clients/modalDialog'
 import { getPublicEvaluation, startRespondent } from './respondentApi'
 import RespondentTaskScenarioPage from './RespondentTaskScenarioPage'
 import RespondentQuestionnairePage from './RespondentQuestionnairePage'
@@ -172,7 +173,6 @@ function EligibilityCard({ criteria, checkedCriteriaIds, onToggle, onContinue })
   return (
     <section className="respondent-card respondent-criteria-card" aria-labelledby="criteria-heading">
       <div className="respondent-card-heading">
-        <span className="respondent-card-kicker">Sebelum mulai</span>
         <h2 id="criteria-heading">Kriteria Responden</h2>
         <p>Pastikan Anda memenuhi seluruh kriteria berikut untuk ikut berpartisipasi.</p>
       </div>
@@ -339,18 +339,22 @@ function ProfileCard({ profile, error, submitting, submittedRespondent, onChange
 
 function ScenarioBriefingDialog({ taskCount, estimateMinutes, submitting, onConfirm, onCancel }) {
   const hasTasks = taskCount > 0
+  const dialogRef = useRef(null)
+
+  useModalDialog({ dialogRef, onClose: onCancel })
 
   return (
     <div className="respondent-modal-overlay" role="presentation">
       <section
+        ref={dialogRef}
         className="respondent-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="briefing-heading"
         aria-describedby="briefing-description"
+        tabIndex={-1}
       >
         <div className="respondent-modal-icon" aria-hidden="true">◷</div>
-        <span className="respondent-card-kicker">Sebelum melanjutkan</span>
         <h2 id="briefing-heading">Siap mengerjakan skenario tugas?</h2>
         <p id="briefing-description">
           {hasTasks

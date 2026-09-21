@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ApiError } from '../../shared/api/apiClient'
 import { lockBodyScroll } from '../../shared/clients/scrollLock'
+import { useModalDialog } from '../../shared/clients/modalDialog'
 import { submitTaskAttempts } from './respondentApi'
 import './RespondentTaskScenarioPage.css'
 
@@ -115,6 +116,11 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
     if (isStarted) return undefined
     return lockBodyScroll()
   }, [isStarted])
+
+  // The start/interstitial overlay is a gate, not a dismissible dialog: it traps
+  // focus and hides the background, but Escape has nothing to close.
+  const dialogPanelRef = useRef(null)
+  useModalDialog({ open: !isStarted, dialogRef: dialogPanelRef })
 
   useEffect(() => {
     storeTaskProgress(token, currentIndex)
@@ -282,7 +288,7 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
       {!isStarted && (
         <div className="task-start-overlay" role="presentation">
           {lastResult ? (
-            <section className="task-start-dialog task-interstitial-dialog" role="dialog" aria-modal="true" aria-labelledby="task-interstitial-heading">
+            <section ref={dialogPanelRef} className="task-start-dialog task-interstitial-dialog" role="dialog" aria-modal="true" aria-labelledby="task-interstitial-heading" tabIndex={-1}>
               <div className="task-interstitial-result" data-success={lastResult.success}>
                 <span className="task-interstitial-result-icon" aria-hidden="true">{lastResult.success ? '✓' : '△'}</span>
                 <span>{lastResult.success ? 'Tugas Selesai' : 'Tugas Gagal'}</span>
@@ -299,9 +305,8 @@ export default function RespondentTaskScenarioPage({ tasks: sourceTasks, appName
               </button>
             </section>
           ) : (
-            <section className="task-start-dialog" role="dialog" aria-modal="true" aria-labelledby="task-start-heading" aria-describedby="task-start-description">
+            <section ref={dialogPanelRef} className="task-start-dialog" role="dialog" aria-modal="true" aria-labelledby="task-start-heading" aria-describedby="task-start-description" tabIndex={-1}>
               <div className="task-start-icon" aria-hidden="true">◷</div>
-              <span className="task-eyebrow">Persiapan tugas</span>
               <h2 id="task-start-heading">Siap memulai skenario?</h2>
               <p id="task-start-description">
                 Instruksi tugas ditampilkan di panel kiri. Tekan tombol mulai untuk mengaktifkan timer, lalu buka website evaluasi di tab baru atau perangkat lain melalui tombol di bawah.
