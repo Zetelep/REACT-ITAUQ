@@ -439,7 +439,7 @@
 /* iOS Safari zooms the viewport when a focused field's text is under 16px. The
    floor applies on small screens; the desktop size is unchanged. */
 @media (max-width: 640px) {
-  .filter-input, .modal-input, .modal-textarea {
+  .filter-input, .filter-select, .modal-input, .modal-textarea {
     font-size: var(--text-base);
   }
 }

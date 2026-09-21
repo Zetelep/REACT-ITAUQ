@@ -1,27 +1,23 @@
+/* Full-bleed, but measured in `%` rather than `vw`. `100vw` includes the width of
+   the vertical scrollbar, so the page was wider than the viewport by that amount
+   and `overflow-x: hidden` was hiding the result — including the parts of the
+   question scale that ran past the edge. Reflow is handled per-component now. */
 html:has(.respondent-questionnaire-page),
 body:has(.respondent-questionnaire-page),
 #root:has(.respondent-questionnaire-page) {
   width: 100%;
-  min-width: 100vw;
   background: #f7fbf9 !important;
 }
 
-body:has(.respondent-questionnaire-page) {
-  overflow-x: hidden;
-}
-
 #root:has(.respondent-questionnaire-page) {
-  width: 100vw !important;
   max-width: none !important;
   min-height: 100vh;
   flex: 0 0 auto;
 }
 
 .respondent-questionnaire-page {
-  width: 100vw;
-  min-width: 100vw;
+  width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
   background: #f7fbf9;
   color: var(--survey-ink);
   font-family: var(--sans);
@@ -603,13 +599,32 @@ body:has(.respondent-questionnaire-page) {
   .questionnaire-intro-card h1 {
     font-size: var(--text-2xl);
   }
+}
 
+/* Phones: three columns stop working once an anchor label reaches its longest
+   word ("sangat dapat diandalkan"), and the row used to be clipped rather than
+   scrolled. The anchors move to their own row above the radios so both stay
+   whole, and the radio row takes the full width of the card. */
+@media (max-width: 560px) {
   .questionnaire-scale {
-    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px 14px;
+    margin-top: 16px;
   }
 
-  .questionnaire-scale-label {
-    font-size: var(--text-2xs);
-    font-weight: var(--weight-semibold);
+  .questionnaire-scale-label--min {
+    grid-area: 1 / 1;
+    text-align: start;
+  }
+
+  .questionnaire-scale-label--max {
+    grid-area: 1 / 2;
+    text-align: end;
+  }
+
+  .questionnaire-scale-options {
+    grid-area: 2 / 1 / 3 / 3;
+    justify-content: space-between;
+    gap: 6px;
   }
 }

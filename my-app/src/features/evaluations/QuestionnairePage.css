@@ -1249,7 +1249,7 @@
   }
 
   .evaluation-card-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .detail-page .detail-hero {
@@ -1714,5 +1714,18 @@
 
   .evaluation-links-section .evaluation-link-url {
     font-size: var(--text-2xs);
+  }
+}
+
+/* iOS Safari zooms the viewport when a focused field's text is under 16px.
+   `.filter-input` is declared at --text-sm above and this file is imported after
+   AccountRequestsPage.css, so the floor has to be re-stated here to win; the
+   selects sit alongside the inputs in the same filter bar and need it too. */
+@media (max-width: 640px) {
+  .filter-input,
+  .filter-select,
+  .modal-input,
+  .modal-textarea {
+    font-size: var(--text-base);
   }
 }
