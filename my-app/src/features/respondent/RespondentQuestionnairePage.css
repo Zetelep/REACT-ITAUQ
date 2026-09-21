@@ -1,37 +1,26 @@
+/* Full-bleed, but measured in `%` rather than `vw`. `100vw` includes the width of
+   the vertical scrollbar, so the page was wider than the viewport by that amount
+   and `overflow-x: hidden` was hiding the result — including the parts of the
+   question scale that ran past the edge. Reflow is handled per-component now. */
 html:has(.respondent-questionnaire-page),
 body:has(.respondent-questionnaire-page),
 #root:has(.respondent-questionnaire-page) {
   width: 100%;
-  min-width: 100vw;
   background: #f7fbf9 !important;
 }
 
-body:has(.respondent-questionnaire-page) {
-  overflow-x: hidden;
-}
-
 #root:has(.respondent-questionnaire-page) {
-  width: 100vw !important;
   max-width: none !important;
   min-height: 100vh;
   flex: 0 0 auto;
 }
 
 .respondent-questionnaire-page {
-  --questionnaire-ink: #173632;
-  --questionnaire-ink-soft: #617872;
-  --questionnaire-primary: #1d7767;
-  --questionnaire-primary-dark: #145c50;
-  --questionnaire-primary-soft: #e0f2ec;
-  --questionnaire-accent: #f0a36c;
-  --questionnaire-line: #dce9e4;
-  width: 100vw;
-  min-width: 100vw;
+  width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
   background: #f7fbf9;
-  color: var(--questionnaire-ink);
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--survey-ink);
+  font-family: var(--sans);
   text-align: left;
 }
 
@@ -55,16 +44,16 @@ body:has(.respondent-questionnaire-page) {
   min-height: 72px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--questionnaire-line);
+  border-bottom: 1px solid var(--survey-line);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 5px 18px rgba(27, 86, 73, 0.04);
   padding: 0 29px;
 }
 
 .questionnaire-brand {
-  color: var(--questionnaire-ink);
-  font-size: clamp(1rem, 2vw, 1.35rem);
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.045em;
 }
 
@@ -79,16 +68,16 @@ body:has(.respondent-questionnaire-page) {
   display: flex;
   height: 100%;
   align-items: center;
-  color: #9aaca7;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   white-space: nowrap;
 }
 
 .questionnaire-nav-item.is-active {
-  border-bottom: 3px solid var(--questionnaire-primary);
-  color: var(--questionnaire-primary-dark);
-  font-weight: 800;
+  border-bottom: 3px solid var(--survey-primary);
+  color: var(--survey-primary-strong);
+  font-weight: var(--weight-bold);
 }
 
 .questionnaire-help {
@@ -96,11 +85,11 @@ body:has(.respondent-questionnaire-page) {
   width: 27px;
   height: 27px;
   place-items: center;
-  border: 2px solid var(--questionnaire-primary);
+  border: 2px solid var(--survey-primary);
   border-radius: 50%;
-  color: var(--questionnaire-primary);
-  font-size: 0.9rem;
-  font-weight: 850;
+  color: var(--survey-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
 }
 
 .questionnaire-shell {
@@ -113,12 +102,13 @@ body:has(.respondent-questionnaire-page) {
 }
 
 .questionnaire-progress-row {
+  font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #79918b;
-  font-size: 0.68rem;
-  font-weight: 850;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.08em;
 }
 
@@ -134,7 +124,7 @@ body:has(.respondent-questionnaire-page) {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--questionnaire-primary);
+  background: var(--survey-primary);
   transition: width 180ms ease;
 }
 
@@ -153,28 +143,28 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-eyebrow {
   display: block;
-  color: var(--questionnaire-primary);
-  font-size: 0.67rem;
-  font-weight: 850;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
 .questionnaire-intro-card h1 {
   margin: 9px 0 0;
-  color: var(--questionnaire-ink);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 850;
+  color: var(--survey-ink);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.06em;
-  line-height: 1.04;
+  line-height: var(--leading-display);
 }
 
 .questionnaire-intro-card p {
-  max-width: 610px;
+  max-width: 72ch;
   margin: 14px 0 0;
-  color: var(--questionnaire-ink-soft);
-  font-size: 0.86rem;
-  line-height: 1.55;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 
 .questionnaire-hero-visual {
@@ -220,11 +210,11 @@ body:has(.respondent-questionnaire-page) {
   border: 1px solid #a8cbc0;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.92);
-  color: var(--questionnaire-primary);
-  font-size: 0.75rem;
-  font-weight: 850;
+  color: var(--survey-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.14em;
-  line-height: 1.2;
+  line-height: var(--leading-heading);
   text-align: center;
   transform: translate(-50%, -50%) rotate(-3deg);
 }
@@ -239,16 +229,16 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-section-heading h2 {
   margin: 7px 0 0;
-  color: var(--questionnaire-ink);
-  font-size: 1.25rem;
+  color: var(--survey-ink);
+  font-size: var(--text-lg);
   letter-spacing: -0.035em;
 }
 
 .questionnaire-section-heading p {
   max-width: 340px;
-  color: var(--questionnaire-ink-soft);
-  font-size: 0.78rem;
-  line-height: 1.4;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
   text-align: right;
 }
 
@@ -269,10 +259,10 @@ body:has(.respondent-questionnaire-page) {
   margin: 0;
   border: 1px solid #a8cbc0;
   border-radius: 10px 10px 0 0;
-  background: var(--questionnaire-primary-soft);
-  color: var(--questionnaire-primary-dark);
-  font-size: 1rem;
-  font-weight: 850;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary-strong);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   line-height: 1;
   padding: 11px 18px;
 }
@@ -291,18 +281,19 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-question legend {
   width: 100%;
-  color: var(--questionnaire-ink);
-  font-size: 0.79rem;
-  font-weight: 750;
-  line-height: 1.45;
+  color: var(--survey-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-body);
   padding: 0;
 }
 
 .questionnaire-question-number {
+  font-variant-numeric: tabular-nums;
   display: inline-block;
   min-width: 25px;
-  color: var(--questionnaire-primary);
-  font-weight: 900;
+  color: var(--survey-primary);
+  font-weight: var(--weight-bold);
 }
 
 .questionnaire-scale {
@@ -315,9 +306,9 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-scale-label {
   color: #5a736c;
-  font-size: clamp(0.62rem, 1.2vw, 0.78rem);
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-heading);
   overflow-wrap: break-word;
   text-wrap: balance;
 }
@@ -359,9 +350,9 @@ body:has(.respondent-questionnaire-page) {
 }
 
 .questionnaire-scale-option input:checked + .questionnaire-radio {
-  border: 5px solid var(--questionnaire-primary);
+  border: 5px solid var(--survey-primary);
   background: #fff;
-  box-shadow: 0 0 0 3px var(--questionnaire-primary-soft);
+  box-shadow: 0 0 0 3px var(--survey-primary-tint);
 }
 
 .questionnaire-scale-option input:focus-visible + .questionnaire-radio {
@@ -370,8 +361,9 @@ body:has(.respondent-questionnaire-page) {
 }
 
 .questionnaire-scale-number {
-  color: #6f8780;
-  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
   line-height: 1;
 }
 
@@ -389,8 +381,8 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-category--sus .questionnaire-scale-label {
   color: #3d5c54;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
 }
 
 .questionnaire-form-error {
@@ -398,9 +390,9 @@ body:has(.respondent-questionnaire-page) {
   border: 1px solid #e5b5a3;
   border-radius: 12px;
   background: #fff8f4;
-  color: #a96243;
-  font-size: 0.8rem;
-  line-height: 1.45;
+  color: var(--survey-danger-ink);
+  font-size: var(--text-2xs);
+  line-height: var(--leading-body);
   padding: 13px 15px;
 }
 
@@ -413,8 +405,8 @@ body:has(.respondent-questionnaire-page) {
 }
 
 .questionnaire-submit-row p {
-  color: #81958f;
-  font-size: 0.76rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
 }
 
 .questionnaire-submit-button {
@@ -426,17 +418,17 @@ body:has(.respondent-questionnaire-page) {
   gap: 12px;
   border: 0;
   border-radius: 12px;
-  background: var(--questionnaire-primary);
+  background: var(--survey-primary);
   color: #fff;
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   padding: 12px 18px;
   box-shadow: 0 10px 20px rgba(29, 119, 103, 0.15);
   transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease, opacity 150ms ease;
 }
 
 .questionnaire-submit-button:hover:not(:disabled) {
-  background: var(--questionnaire-primary-dark);
+  background: var(--survey-primary-strong);
   box-shadow: 0 13px 24px rgba(29, 119, 103, 0.22);
   transform: translateY(-1px);
 }
@@ -447,7 +439,7 @@ body:has(.respondent-questionnaire-page) {
 }
 
 .questionnaire-submit-button span {
-  font-size: 1.15rem;
+  font-size: var(--text-lg);
   line-height: 1;
 }
 
@@ -475,10 +467,10 @@ body:has(.respondent-questionnaire-page) {
   margin: 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: var(--questionnaire-primary-soft);
-  color: var(--questionnaire-primary);
-  font-size: 2rem;
-  font-weight: 850;
+  background: var(--survey-primary-tint);
+  color: var(--survey-primary);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
 }
 
 .questionnaire-submitted-card .questionnaire-eyebrow {
@@ -487,24 +479,24 @@ body:has(.respondent-questionnaire-page) {
 
 .questionnaire-submitted-card h1 {
   margin-top: 10px;
-  color: var(--questionnaire-ink);
-  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  color: var(--survey-ink);
+  font-size: var(--text-2xl);
   letter-spacing: -0.05em;
-  line-height: 1.1;
+  line-height: var(--leading-display);
 }
 
 .questionnaire-submitted-card p {
   margin-top: 17px;
-  color: var(--questionnaire-ink-soft);
-  font-size: 0.95rem;
-  line-height: 1.55;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .questionnaire-submitted-card small {
   display: block;
   margin-top: 19px;
-  color: #8aa09a;
-  font-size: 0.72rem;
+  color: var(--survey-ink-soft);
+  font-size: var(--text-2xs);
 }
 
 @media (max-width: 720px) {
@@ -515,7 +507,7 @@ body:has(.respondent-questionnaire-page) {
 
   .questionnaire-brand {
     max-width: 185px;
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
 
   .questionnaire-nav {
@@ -523,7 +515,7 @@ body:has(.respondent-questionnaire-page) {
   }
 
   .questionnaire-nav-item {
-    font-size: 0.75rem;
+    font-size: var(--text-2xs);
   }
 
   .questionnaire-shell {
@@ -575,8 +567,8 @@ body:has(.respondent-questionnaire-page) {
   }
 
   .questionnaire-scale-label {
-    font-size: clamp(0.55rem, 2.5vw, 0.68rem);
-    font-weight: 600;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
   }
 
   .questionnaire-radio {
@@ -585,7 +577,7 @@ body:has(.respondent-questionnaire-page) {
   }
 
   .questionnaire-scale-number {
-    font-size: 0.58rem;
+    font-size: var(--text-2xs);
   }
 
   .questionnaire-submit-row {
@@ -601,19 +593,38 @@ body:has(.respondent-questionnaire-page) {
 
 @media (max-width: 420px) {
   .questionnaire-progress-row {
-    font-size: 0.59rem;
+    font-size: var(--text-2xs);
   }
 
   .questionnaire-intro-card h1 {
-    font-size: 2rem;
+    font-size: var(--text-2xl);
   }
+}
 
+/* Phones: three columns stop working once an anchor label reaches its longest
+   word ("sangat dapat diandalkan"), and the row used to be clipped rather than
+   scrolled. The anchors move to their own row above the radios so both stay
+   whole, and the radio row takes the full width of the card. */
+@media (max-width: 560px) {
   .questionnaire-scale {
-    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px 14px;
+    margin-top: 16px;
   }
 
-  .questionnaire-scale-label {
-    font-size: clamp(0.5rem, 3vw, 0.6rem);
-    font-weight: 600;
+  .questionnaire-scale-label--min {
+    grid-area: 1 / 1;
+    text-align: start;
+  }
+
+  .questionnaire-scale-label--max {
+    grid-area: 1 / 2;
+    text-align: end;
+  }
+
+  .questionnaire-scale-options {
+    grid-area: 2 / 1 / 3 / 3;
+    justify-content: space-between;
+    gap: 6px;
   }
 }

@@ -170,7 +170,6 @@ export default function HasilSUSPage() {
     <div className="page-container sus-page">
       <div className="page-header">
         <div>
-          <p className="page-eyebrow">SUS ANALYSIS</p>
           <h1>Hasil SUS</h1>
           <p className="page-subtitle">Statistik System Usability Score dari seluruh responden yang telah mengisi kuesioner.</p>
         </div>
@@ -182,7 +181,6 @@ export default function HasilSUSPage() {
         <div className="table-loading">Memuat data SUS...</div>
       ) : !stats || stats.count === 0 ? (
         <div className="sus-empty">
-          <span className="empty-state-icon" aria-hidden="true">📊</span>
           <strong>Belum ada data SUS.</strong>
           <span>Responden belum menyelesaikan pengisian SUS.</span>
         </div>

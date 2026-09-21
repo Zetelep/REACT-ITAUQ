@@ -11,7 +11,7 @@
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13, 148, 136, 0.10), transparent),
     radial-gradient(ellipse 60% 50% at 90% 110%, rgba(20, 184, 166, 0.08), transparent),
-    var(--bg);
+    var(--surface-canvas-teal);
 }
 
 /* ─── Card ─── */
@@ -19,8 +19,8 @@
   margin: auto;
   width: 100%;
   max-width: 400px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--primary-tint);
   border-radius: 20px;
   padding: 40px 36px 32px;
   box-shadow: 0 20px 60px rgba(15, 118, 110, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -54,10 +54,10 @@
 }
 
 .auth-logo span {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: 1px;
-  color: var(--text-h);
+  color: var(--ink-strong);
 }
 
 /* ─── Header ─── */
@@ -67,16 +67,16 @@
 }
 
 .auth-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.4px;
-  color: var(--text-h);
+  color: var(--ink-strong);
   margin: 0 0 6px;
 }
 
 .auth-header p {
-  font-size: 0.875rem;
-  color: var(--text);
+  font-size: var(--text-sm);
+  color: var(--ink);
   margin: 0;
 }
 
@@ -95,26 +95,9 @@
 }
 
 .auth-field-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-h);
-}
-
-.auth-field-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.auth-forgot-link {
-  font-size: 0.75rem;
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.auth-forgot-link:hover {
-  text-decoration: underline;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-strong);
 }
 
 .auth-field-input-wrapper {
@@ -123,39 +106,27 @@
   align-items: center;
 }
 
-.auth-field-icon {
-  position: absolute;
-  left: 14px;
-  color: var(--text);
-  opacity: 0.45;
-  font-size: 0.95rem;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-}
-
 .auth-field-input {
   width: 100%;
-  padding: 12px 14px 12px 42px;
-  border: 1.5px solid var(--border);
+  padding: 12px 14px;
+  border: 1.5px solid var(--primary-tint);
   border-radius: 12px;
-  font-size: 0.925rem;
+  font-size: var(--text-sm);
   font-family: inherit;
-  background: var(--input-bg);
-  color: var(--text-h);
+  background: var(--surface-input);
+  color: var(--ink-strong);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
   outline: none;
 }
 
 .auth-field-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-wash);
 }
 
 .auth-field-input::placeholder {
-  color: var(--text);
-  opacity: 0.45;
+  color: var(--ink-muted);
 }
 
 /* ─── Submit Button ─── */
@@ -165,10 +136,10 @@
   margin-top: 4px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #0f766e, #0d9488);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
   font-family: inherit;
   letter-spacing: 0.2px;
   cursor: pointer;
@@ -218,21 +189,21 @@
 /* ─── Divider + Footer ─── */
 .auth-divider {
   height: 1px;
-  background: var(--border);
+  background: var(--primary-tint);
   margin: 24px 0 18px;
 }
 
 .auth-footer {
   text-align: center;
-  font-size: 0.85rem;
-  color: var(--text);
+  font-size: var(--text-sm);
+  color: var(--ink);
   margin: 0;
 }
 
 .auth-footer a {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .auth-footer a:hover {
@@ -243,8 +214,8 @@
 .auth-message {
   padding: 11px 14px;
   border-radius: 10px;
-  font-size: 0.83rem;
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
   margin-bottom: 16px;
   animation: fadeSlideIn 0.3s ease;
 }
@@ -252,13 +223,13 @@
 .auth-message.success {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #059669;
+  color: var(--success-ink);
 }
 
 .auth-message.error {
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #dc2626;
+  color: var(--danger);
 }
 
 @keyframes fadeSlideIn {
@@ -280,25 +251,10 @@
   }
 }
 
-/* ─── Dark Mode ─── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --card-bg: #1e2027;
-    --input-bg: rgba(255, 255, 255, 0.04);
-  }
-
-  .auth-page {
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13, 148, 136, 0.12), transparent),
-      radial-gradient(ellipse 60% 50% at 90% 110%, rgba(20, 184, 166, 0.07), transparent),
-      var(--bg);
-  }
-
-  .auth-card {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  .auth-submit-btn {
-    background: linear-gradient(135deg, #0d9488, #14b8a6);
+/* iOS Safari zooms the viewport when a focused field's text is under 16px. The
+   floor applies on small screens; the desktop size is unchanged. */
+@media (max-width: 640px) {
+  .auth-field-input {
+    font-size: var(--text-base);
   }
 }

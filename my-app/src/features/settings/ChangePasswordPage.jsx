@@ -47,12 +47,14 @@ export default function ChangePasswordPage() {
         </p>
 
         <form className="change-pw-form" onSubmit={handleSubmit}>
-          {error && <div className="change-pw-error">{error}</div>}
+          {error && <div className="change-pw-error" role="alert">{error}</div>}
 
           <div className="change-pw-field">
-            <label>Password Baru</label>
+            <label htmlFor="change-pw-new">Password Baru</label>
             <input
+              id="change-pw-new"
               type="password"
+              name="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Minimal 8 karakter"
@@ -61,9 +63,11 @@ export default function ChangePasswordPage() {
           </div>
 
           <div className="change-pw-field">
-            <label>Konfirmasi Password Baru</label>
+            <label htmlFor="change-pw-confirm">Konfirmasi Password Baru</label>
             <input
+              id="change-pw-confirm"
               type="password"
+              name="confirm-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Ketik ulang password baru"

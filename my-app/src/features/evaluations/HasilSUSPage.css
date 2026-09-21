@@ -12,45 +12,31 @@
 
 .sus-page .page-header h1 {
   color: #123b37;
-  font-size: clamp(1.7rem, 3vw, 2.35rem);
-  font-weight: 780;
-  letter-spacing: -0.045em;
-  line-height: 1.05;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.03em;
+  line-height: var(--leading-display);
 }
 
 .sus-page .page-subtitle {
-  color: #71817e;
-  font-size: 0.9rem;
-  line-height: 1.55;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
   margin: 9px 0 0;
   max-width: 520px;
 }
 
-.sus-page .page-eyebrow {
-  color: #0f766e;
-  font-size: 0.68rem;
-  font-weight: 850;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
 .sus-empty {
-  color: #9aa9a6;
-  font-size: 0.82rem;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
   padding: 60px 20px;
   text-align: center;
-}
-
-.sus-empty .empty-state-icon {
-  display: block;
-  font-size: 2rem;
-  margin-bottom: 12px;
 }
 
 .sus-empty strong {
   color: #526460;
   display: block;
-  font-size: 1rem;
+  font-size: var(--text-base);
   margin-bottom: 4px;
 }
 
@@ -81,7 +67,7 @@
 }
 
 .sus-stat-featured {
-  background: linear-gradient(135deg, #0c4c46 0%, #0f766e 72%, #159b8e 100%);
+  background: linear-gradient(135deg, #0c4c46 0%, var(--primary) 72%, #159b8e 100%);
   border-color: transparent;
   box-shadow: 0 14px 30px rgba(15, 118, 110, 0.16);
   color: #fff;
@@ -94,8 +80,8 @@
 
 .sus-stat-label {
   color: #60716d;
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -105,30 +91,32 @@
 }
 
 .sus-stat-value {
+  font-variant-numeric: tabular-nums;
   color: #fff;
-  font-size: 2.8rem;
-  font-weight: 800;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.06em;
   line-height: 1;
 }
 
 .sus-stat-unit {
+  font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   margin-top: -2px;
 }
 
 .sus-stat-meta {
   color: rgba(255, 255, 255, 0.45);
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   margin-top: auto;
 }
 
 .sus-stat-mark {
   color: rgba(255, 255, 255, 0.06);
-  font-size: 3.2rem;
-  font-weight: 900;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.08em;
   line-height: 1;
   pointer-events: none;
@@ -138,16 +126,17 @@
 }
 
 .sus-stat-value-secondary {
+  font-variant-numeric: tabular-nums;
   color: #183f3a;
-  font-size: 1.5rem;
-  font-weight: 780;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: var(--leading-heading);
 }
 
 .sus-stat-note {
-  color: #84938f;
-  font-size: 0.72rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   margin-top: auto;
 }
 
@@ -166,15 +155,15 @@
 
 .sus-adjective-header h2 {
   color: #134e4a;
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
 
 .sus-adjective-header p {
-  color: #84938f;
-  font-size: 0.77rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   margin: 0;
 }
 
@@ -200,8 +189,8 @@
 
 .sus-adjective-segment span {
   color: #fff;
-  font-size: 0.68rem;
-  font-weight: 750;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
@@ -232,28 +221,29 @@
 
 .sus-legend-label {
   color: #334155;
-  font-size: 0.78rem;
-  font-weight: 650;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
 }
 
 .sus-legend-count {
+  font-variant-numeric: tabular-nums;
   color: #183f3a;
-  font-size: 0.88rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   text-align: right;
 }
 
 .sus-legend-pct {
   color: #60716d;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   grid-column: 2 / 3;
 }
 
 .sus-legend-range {
-  color: #9aa9a6;
-  font-size: 0.65rem;
-  font-weight: 550;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
   grid-column: 3 / 4;
   text-align: right;
 }
@@ -273,15 +263,15 @@
 
 .sus-distribution-header h2 {
   color: #134e4a;
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
 
 .sus-distribution-header p {
-  color: #84938f;
-  font-size: 0.77rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   margin: 0;
 }
 
@@ -304,9 +294,10 @@
 }
 
 .sus-dist-bar-count {
+  font-variant-numeric: tabular-nums;
   color: #183f3a;
-  font-size: 0.88rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
 }
 
 .sus-dist-bar-track {
@@ -328,15 +319,15 @@
 
 .sus-dist-bar-label {
   color: #334155;
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   text-align: center;
 }
 
 .sus-dist-bar-range {
-  color: #9aa9a6;
-  font-size: 0.62rem;
-  font-weight: 550;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
   text-align: center;
 }
 
@@ -359,15 +350,15 @@
 
 .sus-respondents-header h2 {
   color: #134e4a;
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
 
 .sus-respondents-header p {
-  color: #84938f;
-  font-size: 0.77rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   margin: 0;
 }
 
@@ -379,8 +370,8 @@
 
 .sus-sort-control label {
   color: #60716d;
-  font-size: 0.72rem;
-  font-weight: 650;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
 }
 
 .sus-sort-control select {
@@ -389,7 +380,7 @@
   border-radius: 8px;
   color: #334155;
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
   padding: 6px 10px;
 }
 
@@ -405,7 +396,7 @@
 }
 
 .data-table.sus-respondent-table th {
-  font-size: 0.65rem;
+  font-size: var(--text-2xs);
   white-space: nowrap;
 }
 
@@ -449,16 +440,16 @@
 }
 
 .sus-td-index {
-  color: #9aa9a6;
-  font-size: 0.74rem;
-  font-weight: 600;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
 }
 
 .sus-td-questionnaire span {
   color: #334155;
   display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -466,34 +457,35 @@
 }
 
 .sus-td-questionnaire small {
-  color: #9aa9a6;
+  color: var(--ink-muted);
   display: block;
-  font-size: 0.68rem;
+  font-size: var(--text-2xs);
   margin-top: 2px;
 }
 
 .sus-td-admin {
   color: #526460;
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
 }
 
 .sus-td-score {
-  color: #0f766e;
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
 }
 
 .sus-rating-badge {
   border-radius: 6px;
   display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 750;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   padding: 3px 8px;
 }
 
 .sus-td-date {
-  color: #84938f;
-  font-size: 0.76rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   white-space: nowrap;
 }
 
@@ -514,8 +506,8 @@
   color: #526460;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   min-width: 34px;
   padding: 6px 10px;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -524,7 +516,7 @@
 .sus-respondents-section .pagination-btn:hover:not(:disabled) {
   background: #e8f0ee;
   border-color: #a9d0c7;
-  color: #0f766e;
+  color: var(--primary);
 }
 
 .sus-respondents-section .pagination-btn:disabled {
@@ -533,8 +525,8 @@
 }
 
 .sus-respondents-section .pagination-active {
-  background: #0f766e;
-  border-color: #0f766e;
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
 }
 
@@ -545,15 +537,15 @@
 }
 
 .sus-respondents-section .pagination-ellipsis {
-  color: #9aa9a6;
-  font-size: 0.8rem;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
   padding: 0 2px;
 }
 
 .sus-respondents-section .pagination-info {
-  color: #84938f;
-  font-size: 0.72rem;
-  font-weight: 600;
+  color: var(--ink-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   margin-left: 8px;
 }
 
@@ -586,7 +578,7 @@
   }
 
   .sus-stat-value {
-    font-size: 2.2rem;
+    font-size: var(--text-2xl);
   }
 
   .sus-respondents-header {

@@ -27,7 +27,7 @@ function formatStatus(status) {
 }
 
 function statusClass(status) {
-  return status === 'closed' ? 'done' : status === 'active' ? 'waiting' : ''
+  return status === 'closed' ? 'badge-approved' : status === 'active' ? 'badge-pending' : ''
 }
 
 export default function DashboardPage() {
@@ -81,7 +81,7 @@ export default function DashboardPage() {
     <div className="dashboard-content">
       <div className="dashboard-header-card large">
         <div className="header-left">
-          <h2 className="header-title">Dashboard Evaluasi Usability</h2>
+          <h1 className="header-title">Dashboard Evaluasi Usability</h1>
           <p className="header-desc">Indonesian Tourism Application Usability Questionnaire — buat, kelola, dan pantau evaluasi usability aplikasi pariwisata Anda dalam satu tempat.</p>
           <div className="header-actions">
             <button className="primary-btn" onClick={() => navigate('/admin/evaluasi')}>+ Buat Evaluasi</button>
@@ -89,7 +89,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {error && <div className="page-error">{error}</div>}
+      {error && <div className="page-error" role="alert">{error}</div>}
 
       <div className="stats-row">
         <div className="stat-card boxed">
@@ -108,15 +108,18 @@ export default function DashboardPage() {
 
       <section className="latest-section">
         <div className="latest-header-row">
-          <h3 className="latest-title">Evaluasi Terbaru</h3>
+          <h2 className="latest-title">Evaluasi Terbaru</h2>
           <button className="archive-link" onClick={() => navigate('/admin/evaluasi')}>Buka Arsip</button>
         </div>
 
         <div className="latest-cards">
           {loading ? (
-            <div className="table-loading">Memuat data evaluasi...</div>
+            <div className="table-loading" role="status">Memuat data evaluasi...</div>
           ) : latestEvaluations.length === 0 ? (
-            <div className="table-empty">Belum ada evaluasi.</div>
+            <div className="table-empty">
+              <strong>Belum ada evaluasi.</strong>
+              <span>Buat evaluasi pertama untuk mulai menyiapkan proyek.</span>
+            </div>
           ) : (
             latestEvaluations.map((evaluation) => (
               <EvaluationSummary
@@ -138,7 +141,6 @@ function EvaluationSummary({ evaluation, onClick }) {
 
   return (
     <div className="latest-card">
-      <div className="card-icon">📄</div>
       <div className="card-body">
         <div className="card-title">{title}</div>
         <span className={`status-badge ${statusClass(evaluation.status)}`}>{status}</span>

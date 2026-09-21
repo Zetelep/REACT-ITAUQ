@@ -12,6 +12,7 @@ export default function SignUpForm({ onBackClick }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [submittedEmail, setSubmittedEmail] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -37,29 +38,50 @@ export default function SignUpForm({ onBackClick }) {
         institution: formData.institution || undefined,
         occupation: formData.job || undefined,
       }, { public: true })
-      alert('Pengajuan sukses, silahkan tunggu email dari kami jika disetujui')
+      setSubmittedEmail(formData.email)
       setFormData({ email: '', fullName: '', institution: '', job: '' })
-      onBackClick()
     } catch (err) {
       if (err.code === 'DUPLICATE_APPLICATION') {
-        setError('Pengajuan dengan email ini sudah ada dan masih menunggu review.')
+        setError('Pengajuan dengan email ini sudah ada dan masih menunggu peninjauan.')
       } else {
-        setError(err.message || 'Gagal mengajukan. Silakan coba lagi.')
+        setError(err.message || 'Gagal mengirim pengajuan. Silakan coba lagi.')
       }
     } finally {
       setLoading(false)
     }
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleSubmit()
+  if (submittedEmail) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <div className="auth-logo">
+            <img src={logoItauq} alt="" width="34" height="34" />
+            <span>ITAUQ</span>
+          </div>
+
+          <div className="auth-header">
+            <h1>Pengajuan terkirim</h1>
+            <p>Pengajuan akses Anda sedang ditinjau.</p>
+          </div>
+
+          <div className="auth-message success" role="status">
+            Kami akan mengirim email ke {submittedEmail} setelah pengajuan disetujui.
+          </div>
+
+          <button type="button" className="auth-submit-btn" onClick={onBackClick}>
+            Kembali ke halaman masuk
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <img src={logoItauq} alt="ITAUQ logo" />
+          <img src={logoItauq} alt="" />
           <span>ITAUQ</span>
         </div>
 
@@ -68,13 +90,19 @@ export default function SignUpForm({ onBackClick }) {
           <p>Isi identitas Anda untuk mengajukan akses</p>
         </div>
 
-        <div className="auth-form" onKeyDown={handleKeyDown}>
-          {error && <div className="auth-message error">{error}</div>}
+        <form
+          className="auth-form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit()
+          }}
+        >
+          {error && <div className="auth-message error" role="alert">{error}</div>}
           <div className="auth-field">
-            <label className="auth-field-label">Email</label>
+            <label className="auth-field-label" htmlFor="signup-email">Email</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">✉</span>
               <input
+                id="signup-email"
                 className="auth-field-input"
                 type="email"
                 name="email"
@@ -82,15 +110,16 @@ export default function SignUpForm({ onBackClick }) {
                 onChange={handleChange}
                 placeholder="you@example.com"
                 autoComplete="email"
+                spellCheck={false}
               />
             </div>
           </div>
 
           <div className="auth-field">
-            <label className="auth-field-label">Nama Lengkap</label>
+            <label className="auth-field-label" htmlFor="signup-name">Nama Lengkap</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">👤</span>
               <input
+                id="signup-name"
                 className="auth-field-input"
                 type="text"
                 name="fullName"
@@ -103,38 +132,40 @@ export default function SignUpForm({ onBackClick }) {
           </div>
 
           <div className="auth-field">
-            <label className="auth-field-label">Institusi/Organisasi</label>
+            <label className="auth-field-label" htmlFor="signup-institution">Institusi/Organisasi</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">🏢</span>
               <input
+                id="signup-institution"
                 className="auth-field-input"
                 type="text"
                 name="institution"
                 value={formData.institution}
                 onChange={handleChange}
                 placeholder="Masukkan institusi/organisasi Anda"
+                autoComplete="organization"
               />
             </div>
           </div>
 
           <div className="auth-field">
-            <label className="auth-field-label">Pekerjaan</label>
+            <label className="auth-field-label" htmlFor="signup-job">Pekerjaan</label>
             <div className="auth-field-input-wrapper">
-              <span className="auth-field-icon">💼</span>
               <input
+                id="signup-job"
                 className="auth-field-input"
                 type="text"
                 name="job"
                 value={formData.job}
                 onChange={handleChange}
                 placeholder="Masukkan pekerjaan Anda"
+                autoComplete="organization-title"
               />
             </div>
           </div>
 
           <button
             className={`auth-submit-btn${loading ? ' loading' : ''}`}
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
           >
             {loading && (
@@ -144,7 +175,7 @@ export default function SignUpForm({ onBackClick }) {
             )}
             {loading ? 'Memproses...' : 'Ajukan'}
           </button>
-        </div>
+        </form>
 
         <div className="auth-divider" />
 

@@ -1,58 +1,32 @@
 :root {
-  --text: #374151;
-  --text-h: #111827;
-  --bg: #f0fdfa; /* Light greenish background */
-  --border: #ccfbf1;
-  --code-bg: #e6fffa;
-  --accent: #0f766e; /* Modern Greenish */
-  --accent-bg: rgba(15, 118, 110, 0.1);
-  --accent-border: rgba(15, 118, 110, 0.5);
-  --social-bg: rgba(224, 242, 254, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.05) 0 4px 6px -1px, rgba(0, 0, 0, 0.03) 0 2px 4px -1px;
-
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  /* Light-only on purpose. Every feature stylesheet is authored against light
+     surfaces; declaring `light dark` produced a second, purple-accented theme that
+     only the auth screen honoured. Colour roles live in styles/tokens.css. */
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--surface-canvas-teal);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    font-size: var(--text-base);
   }
 }
 
 body {
   margin: 0;
+}
+
+/* App-wide border-box reset. This previously lived in LandingPage.css, which meant a
+   single page's stylesheet was resetting the whole app. Same effect, correct home. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 #root {
@@ -67,45 +41,89 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3,
+h4 {
   font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  font-weight: var(--weight-medium);
+  color: var(--ink-strong);
+  /* Headings break with intention instead of leaving one word on the last line. */
+  text-wrap: balance;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
+  font-size: var(--text-3xl);
+  letter-spacing: -0.03em;
+  line-height: var(--leading-display);
   margin: 32px 0;
   @media (max-width: 1024px) {
-    font-size: 36px;
+    font-size: var(--text-2xl);
     margin: 20px 0;
   }
 }
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
+  font-size: var(--text-xl);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.02em;
   margin: 0 0 8px;
   @media (max-width: 1024px) {
-    font-size: 20px;
+    font-size: var(--text-lg);
   }
 }
 p {
   margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  /* Descriptions avoid single-word last lines without the cost of `balance`
+     on long-form text. */
+  text-wrap: pretty;
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
+  font-family: var(--mono);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
   padding: 4px 8px;
-  background: var(--code-bg);
+  border-radius: 4px;
+  color: var(--ink-strong);
+  background: var(--surface-sunken);
+}
+
+/* Focus ring for controls that had none of their own. :where() keeps specificity
+   at zero so every feature stylesheet can still override it, and so form fields
+   that already draw their own ring are untouched. */
+:where(a[href], button, [role="button"], summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring, currentColor);
+  outline-offset: 2px;
+}
+
+/* First focusable element in the admin shell: skips the sidebar and topbar. */
+.skip-link {
+  position: fixed;
+  z-index: 300;
+  inset-inline-start: 16px;
+  inset-block-start: -100px;
+  border-radius: 0 0 10px 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  padding: 12px 18px;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  inset-block-start: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
 }

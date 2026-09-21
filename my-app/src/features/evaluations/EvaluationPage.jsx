@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useProfile } from '../../app/providers/ProfileProvider'
 import { api } from '../../shared/api/apiClient'
 import { uploadQuestionnaireImage } from '../../shared/clients/imageUpload'
+import { useModalDialog } from '../../shared/clients/modalDialog'
 import '../account-management/AccountRequestsPage.css'
 import './QuestionnairePage.css'
 import EvaluationLinksSection from './EvaluationLinksSection'
@@ -162,7 +163,6 @@ function QuestionnaireList({ superAdminView }) {
     <div className="page-container questionnaire-page">
       <div className="page-header">
         <div>
-          <p className="page-eyebrow">ITAUQ</p>
           <h1>{superAdminView ? 'Semua Evaluasi' : 'Evaluasi Saya'}</h1>
           <p className="page-subtitle">
             {superAdminView ? 'Pantau seluruh proyek evaluasi administrator.' : 'Buat dan kelola proyek evaluasi usability aplikasi Anda.'}
@@ -208,24 +208,23 @@ function QuestionnaireList({ superAdminView }) {
           <span className="evaluation-stat-label">Terlihat</span>
           <strong>{questionnaires.length}</strong>
           <small>evaluasi di halaman ini</small>
-          <span className="evaluation-stat-mark" aria-hidden="true"></span>
         </article>
         <article className="evaluation-stat-card">
           <span className="evaluation-stat-label">Aktif</span>
           <strong>{questionnaires.filter((item) => item.status === 'active').length}</strong>
-          <small>siap menerima respons</small>
+          <small>di halaman ini</small>
           <span className="evaluation-stat-dot is-active" aria-hidden="true" />
         </article>
         <article className="evaluation-stat-card">
           <span className="evaluation-stat-label">Draft</span>
           <strong>{questionnaires.filter((item) => item.status === 'draft').length}</strong>
-          <small>masih dalam persiapan</small>
+          <small>di halaman ini</small>
           <span className="evaluation-stat-dot is-draft" aria-hidden="true" />
         </article>
         <article className="evaluation-stat-card">
           <span className="evaluation-stat-label">Selesai</span>
           <strong>{questionnaires.filter((item) => item.status === 'closed').length}</strong>
-          <small>evaluasi yang ditutup</small>
+          <small>di halaman ini</small>
           <span className="evaluation-stat-dot is-closed" aria-hidden="true" />
         </article>
       </div>
@@ -233,7 +232,6 @@ function QuestionnaireList({ superAdminView }) {
       <section className="data-table-card evaluation-board">
         <div className="evaluation-board-header">
           <div>
-            <p className="board-eyebrow">Workspace</p>
             <h2>Daftar evaluasi</h2>
             <p>Pilih evaluasi untuk mengatur task, kriteria, dan tautan responden.</p>
           </div>
@@ -244,7 +242,6 @@ function QuestionnaireList({ superAdminView }) {
           <div className="table-loading">Memuat daftar evaluasi...</div>
         ) : questionnaires.length === 0 ? (
           <div className="table-empty">
-            <span className="empty-state-icon" aria-hidden="true">＋</span>
             <strong>Belum ada evaluasi.</strong>
             <span>{canCreate ? 'Buat evaluasi pertama untuk mulai menyiapkan proyek.' : 'Tidak ada evaluasi yang sesuai dengan filter.'}</span>
           </div>
@@ -525,7 +522,6 @@ function QuestionnaireDetail({ questionnaireId, superAdminView }) {
       <section className="setup-flow" aria-label="Alur penyiapan evaluasi">
         <div className="setup-flow-heading">
           <div>
-            <p className="page-eyebrow">Setup Evaluasi</p>
             <h2>Susun alur responden dari atas ke bawah</h2>
             <p className="setup-flow-intro">Mulai dari informasi aplikasi, lalu susun task yang akan dikerjakan responden. Setelah itu, tambahkan kriteria kelayakan bila diperlukan dan bagikan link publik saat evaluasi siap digunakan.</p>
           </div>
@@ -781,7 +777,7 @@ function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
     <Modal title={editing ? 'Edit Evaluasi' : 'Buat Evaluasi'} onClose={onClose}>
       <form onSubmit={submit}>
         {error && <div className="change-pw-error modal-error">{error}</div>}
-        <div className="modal-field"><label htmlFor="questionnaire-title">Judul Evaluasi</label><input id="questionnaire-title" className="modal-input" value={form.title} onChange={(event) => update('title', event.target.value)} autoFocus /></div>
+        <div className="modal-field"><label htmlFor="questionnaire-title">Judul Evaluasi</label><input id="questionnaire-title" className="modal-input" value={form.title} onChange={(event) => update('title', event.target.value)} /></div>
         <div className="modal-field"><label htmlFor="questionnaire-app">Nama Aplikasi</label><input id="questionnaire-app" className="modal-input" value={form.app_name} onChange={(event) => update('app_name', event.target.value)} /></div>
         <div className="modal-field"><label htmlFor="questionnaire-description">Deskripsi <span>(opsional)</span></label><textarea id="questionnaire-description" className="modal-textarea" value={form.description || ''} onChange={(event) => update('description', event.target.value)} rows={3} /></div>
         <div className="modal-two-columns">
@@ -794,20 +790,27 @@ function QuestionnaireModal({ questionnaire, onClose, onSubmit, submitting }) {
           <span className="modal-help">Tautan ke aplikasi yang akan dievaluasi responden.</span>
         </div>
         <div className="modal-field">
-          <label>Gambar Aplikasi <span>(opsional)</span></label>
+          <label htmlFor="questionnaire-image">Gambar Aplikasi <span>(opsional)</span></label>
           {imagePreview ? (
             <div className="modal-image-preview">
               <img src={imagePreview} alt="Pratinjau gambar aplikasi" />
-              <button type="button" className="modal-image-remove" onClick={removeImage} title="Hapus gambar">×</button>
+              <button type="button" className="modal-image-remove" onClick={removeImage} aria-label="Hapus gambar aplikasi">×</button>
             </div>
           ) : (
-            <label htmlFor="questionnaire-image" className="modal-image-upload">
+            <label className="modal-image-upload">
+              <input
+                id="questionnaire-image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="modal-image-input"
+                aria-label="Unggah gambar aplikasi"
+              />
               <span className="modal-image-upload-icon" aria-hidden="true">+</span>
               <span>Pilih gambar</span>
               <small>JPG, PNG, WEBP — dikompres otomatis di bawah 500 KB</small>
             </label>
           )}
-          <input id="questionnaire-image" type="file" accept="image/*" onChange={handleFileChange} className="modal-image-input" />
         </div>
         <ModalActions onClose={onClose} submitting={submitting || uploading} submitLabel={uploading ? 'Mengunggah gambar...' : editing ? 'Simpan Perubahan' : 'Buat Evaluasi'} />
       </form>
@@ -835,7 +838,7 @@ function TaskModal({ task, onClose, onSubmit, submitting }) {
     <Modal title={task ? 'Edit Task Scenario' : 'Tambah Task Scenario'} onClose={onClose}>
       <form onSubmit={submit}>
         {error && <div className="change-pw-error modal-error">{error}</div>}
-        <div className="modal-field"><label htmlFor="task-title">Judul Task</label><input id="task-title" className="modal-input" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} autoFocus /></div>
+        <div className="modal-field"><label htmlFor="task-title">Judul Task</label><input id="task-title" className="modal-input" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} /></div>
         <div className="modal-field"><label htmlFor="task-instruction">Instruksi</label><textarea id="task-instruction" className="modal-textarea" value={form.instruction} onChange={(event) => setForm((current) => ({ ...current, instruction: event.target.value }))} rows={4} /></div>
         <div className="modal-field"><label htmlFor="task-order">Urutan Tampilan</label><input id="task-order" className="modal-input" type="number" min="1" step="1" value={form.task_order} onChange={(event) => setForm((current) => ({ ...current, task_order: event.target.value }))} /></div>
         <ModalActions onClose={onClose} submitting={submitting} submitLabel={task ? 'Simpan Perubahan' : 'Tambah Task'} />
@@ -864,7 +867,7 @@ function CriteriaModal({ criterion, onClose, onSubmit, submitting }) {
     <Modal title={criterion ? 'Edit Kriteria' : 'Tambah Kriteria'} onClose={onClose}>
       <form onSubmit={submit}>
         {error && <div className="change-pw-error modal-error">{error}</div>}
-        <div className="modal-field"><label htmlFor="criteria-statement">Pernyataan</label><textarea id="criteria-statement" className="modal-textarea" value={form.statement} onChange={(event) => setForm((current) => ({ ...current, statement: event.target.value }))} rows={4} autoFocus /></div>
+        <div className="modal-field"><label htmlFor="criteria-statement">Pernyataan</label><textarea id="criteria-statement" className="modal-textarea" value={form.statement} onChange={(event) => setForm((current) => ({ ...current, statement: event.target.value }))} rows={4} /></div>
         <div className="modal-field"><label htmlFor="criteria-order">Urutan Tampilan</label><input id="criteria-order" className="modal-input" type="number" min="0" step="1" value={form.criteria_order} onChange={(event) => setForm((current) => ({ ...current, criteria_order: event.target.value }))} /></div>
         <ModalActions onClose={onClose} submitting={submitting} submitLabel={criterion ? 'Simpan Perubahan' : 'Tambah Kriteria'} />
       </form>
@@ -873,10 +876,23 @@ function CriteriaModal({ criterion, onClose, onSubmit, submitting }) {
 }
 
 function Modal({ title, onClose, children }) {
+  const dialogRef = useRef(null)
+  const titleId = useId()
+
+  useModalDialog({ dialogRef, onClose })
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card questionnaire-modal" onClick={(event) => event.stopPropagation()}>
-        <h2 className="modal-title">{title}</h2>
+      <div
+        ref={dialogRef}
+        className="modal-card questionnaire-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <h2 className="modal-title" id={titleId}>{title}</h2>
         {children}
       </div>
     </div>

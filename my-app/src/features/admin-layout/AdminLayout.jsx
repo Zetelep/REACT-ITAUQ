@@ -22,6 +22,7 @@ import AccountRequestsPage from '../account-management/AccountRequestsPage'
 import AccountManagementPage from '../account-management/AccountManagementPage'
 import ChangePasswordPage from '../settings/ChangePasswordPage'
 import HasilSUSPage from '../evaluations/HasilSUSPage'
+import ConfirmDialog from '../../shared/ui/ConfirmDialog'
 
 import './AdminLayout.css'
 
@@ -47,6 +48,8 @@ export default function AdminLayout() {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
+  const [signOutOpen, setSignOutOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
 
   const activePage = useMemo(() => {
     if (location.pathname.startsWith('/admin/change-password')) return 'change-password'
@@ -71,21 +74,21 @@ export default function AdminLayout() {
   }
 
   const handleSignOut = async () => {
-    const confirmed = window.confirm('Are you sure you want to sign out?')
-    if (confirmed) {
-      await signOut()
-    }
+    setSigningOut(true)
+    await signOut()
   }
 
-  if (profileLoading) return <div className="app-loading">Loading profile...</div>
+  if (profileLoading) return <div className="app-loading" role="status">Memuat profil…</div>
 
   const forceChangePassword = profile?.must_change_password === true
 
   return (
     <div className="dashboard-layout">
+      <a className="skip-link" href="#admin-main">Lewati ke konten utama</a>
+
       {/* ─── Mobile Top Bar ─── */}
       <div className="mobile-topbar">
-        <button className="hamburger" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+        <button className="hamburger" onClick={() => setSidebarOpen(true)} aria-label="Buka menu">
           <span />
           <span />
           <span />
@@ -100,19 +103,19 @@ export default function AdminLayout() {
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-brand">
-            <img src={logoItauq} alt="ITAUQ logo" className="sidebar-brand-logo" />
+            <img src={logoItauq} alt="" width="30" height="30" className="sidebar-brand-logo" />
             <h2>ITAUQ</h2>
           </div>
           {!forceChangePassword && (
             <>
-              <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+              <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? 'Perluas sidebar' : 'Kuncupkan sidebar'}>
                 <img
                   src={sidebarCollapsed ? arrowForwardIcon : arrowBackIcon}
                   alt=""
                   className="sidebar-toggle-icon"
                 />
               </button>
-              <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
+              <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Tutup menu">
                 &times;
               </button>
             </>
@@ -160,15 +163,15 @@ export default function AdminLayout() {
         )}
         <div className="sidebar-footer">
           <p className="sidebar-user">{session?.user?.email}</p>
-          <button className="sidebar-signout" onClick={handleSignOut} title={sidebarCollapsed ? 'Sign Out' : undefined} aria-label="Sign Out">
+          <button className="sidebar-signout" onClick={() => setSignOutOpen(true)} title={sidebarCollapsed ? 'Keluar' : undefined} aria-label="Keluar">
             <img src={logoutIcon} alt="" className="sidebar-icon" />
-            <span className="sidebar-label">Sign Out</span>
+            <span className="sidebar-label">Keluar</span>
           </button>
         </div>
       </aside>
 
       {/* ─── Main Content ─── */}
-      <main className="dashboard-main">
+      <main className="dashboard-main" id="admin-main" tabIndex={-1}>
         {forceChangePassword ? (
           <ChangePasswordPage />
         ) : (
@@ -184,6 +187,18 @@ export default function AdminLayout() {
           </>
         )}
       </main>
+
+      {signOutOpen && (
+        <ConfirmDialog
+          title="Keluar dari akun"
+          description="Anda akan keluar dari sesi ini dan kembali ke halaman masuk."
+          confirmLabel={signingOut ? 'Keluar…' : 'Keluar'}
+          danger
+          busy={signingOut}
+          onConfirm={handleSignOut}
+          onClose={() => setSignOutOpen(false)}
+        />
+      )}
     </div>
   )
 }

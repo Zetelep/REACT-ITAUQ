@@ -1,0 +1,102 @@
+/* Design tokens — the single source of truth for colour roles.
+ *
+ * Every value here was already in the app. This file collects repetition, it does
+ * not introduce a new palette. Two rules govern edits:
+ *
+ *   1. Ink roles must clear 4.5:1 against --surface and --surface-sunken.
+ *      `--ink-muted` is the workhorse de-emphasised text role; it replaced the
+ *      twenty-odd near-identical greys that were drifting between 2.1:1 and 3.9:1.
+ *   2. Surfaces are per-scope. The admin console and the respondent survey are
+ *      deliberately different rooms, so each keeps its own canvas and ink.
+ */
+
+:root {
+  /* ── Surfaces ── */
+  --surface: #ffffff;
+  --surface-input: #ffffff;
+  --surface-sunken: #f8fafc;
+  --surface-canvas-teal: #f0fdfa;
+
+  /* ── Ink (all clear 4.5:1 on --surface, --surface-input and --surface-sunken) ── */
+  --ink-strong: #134e4a;
+  --ink: #374151;
+  --ink-muted: #64748b;
+  --ink-on-accent: #ffffff;
+  --ink-on-dark: #f0fdf4;
+
+  /* ── Lines & tints ── */
+  --primary-tint: #ccfbf1;
+
+  /* ── Brand ── */
+  --primary: #0f766e;
+  --primary-strong: #115e59;
+  --primary-light: #0d9488;
+  --primary-lighter: #14b8a6;
+  --primary-wash: rgba(15, 118, 110, 0.1);
+
+  /* ── State ── */
+  --danger: #dc2626;
+  --danger-ink: #b42318;
+  --danger-tint: rgba(239, 68, 68, 0.08);
+  --success-ink: #047857;
+  --success-tint: rgba(16, 185, 129, 0.12);
+  --warning-ink: #b45309;
+  --warning-tint: rgba(245, 158, 11, 0.12);
+
+  /* ── Focus ── */
+  --focus-ring: #0f766e;
+
+  /* ── Respondent survey surface ──
+     Ordering, task and questionnaire screens are one continuous flow, so they share
+     one palette. These were previously duplicated, prefixed three different ways. */
+  --survey-ink: #173632;
+  --survey-ink-soft: #526b65;
+  --survey-primary: #1d7767;
+  --survey-primary-strong: #145c50;
+  --survey-primary-tint: #e0f2ec;
+  --survey-accent: #f0a36c;
+  --survey-line: #dce9e4;
+  --survey-panel: rgba(255, 255, 255, 0.94);
+  --survey-danger-ink: #a8492a;
+
+  /* ── Type scale ──
+     Seven steps, and nothing in the app sets a one-off size. The app previously
+     carried 385 font-size declarations across ~75 distinct values, about 35 of them
+     clustered between 0.58rem and 1rem where the differences are invisible — drift,
+     not hierarchy. Every console page title draws --text-xl so the title does not
+     change size as you move between sidebar destinations. */
+  --text-2xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 3vw, 2rem);
+  --text-3xl: clamp(2.25rem, 4vw, 2.5rem);
+  --text-display: clamp(2.5rem, 5vw, 4.25rem);
+
+  /* ── Weights ──
+     Four steps, all of which the shipped stack actually provides. The app asked for
+     550 / 650 / 750 / 780 / 850 / 900 in 64 places; no face in the system stack has
+     those weights, so they snapped to a neighbour differently per platform. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ── Leading ── */
+  --leading-display: 1.1;
+  --leading-heading: 1.3;
+  --leading-body: 1.55;
+
+  /* ── Measure ── */
+  --measure: 68ch;
+
+  /* ── Typography ──
+     One family stack for the whole product. `Inter` used to head five of these
+     declarations, but no font file, <link> or dependency ever shipped it, so every
+     screen has always rendered in the platform UI face. The stack now names what it
+     actually resolves to. */
+  --sans: system-ui, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --heading: var(--sans);
+  --mono: ui-monospace, Consolas, monospace;
+}
